@@ -265,6 +265,8 @@ namespace EarlyAlertV2.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
         {
+
+
             if (remoteError != null)
             {
                 ErrorMessage = $"Error from external provider: {remoteError}";

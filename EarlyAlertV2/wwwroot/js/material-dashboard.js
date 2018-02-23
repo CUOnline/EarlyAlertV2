@@ -74,7 +74,7 @@ $(document).ready(function() {
 $(document).on('click', '.navbar-toggle', function() {
     $toggle = $(this);
 
-    if (mobile_menu_visible == 1) {
+    if (mobile_menu_visible === 1) {
         $('html').removeClass('nav-open');
 
         $('.close-layer').remove();
@@ -144,7 +144,7 @@ md = {
 
     initSidebarsCheck: function() {
         if ($(window).width() <= 991) {
-            if ($sidebar.length != 0) {
+            if ($sidebar.length !== 0) {
                 md.initRightMenu();
             }
         }
@@ -162,19 +162,22 @@ md = {
 
             nav_content = '<ul class="nav nav-mobile-menu">' + nav_content + '</ul>';
 
-            navbar_form = $('nav').find('.navbar-form').get(0).outerHTML;
+            navbar_form = $('nav').find('.searchBar').get(0).outerHTML;
+
+            navbar_log = $('nav').find('.logFrm').get(0).outerHTML;
 
             $sidebar_nav = $sidebar_wrapper.find(' > .nav');
 
             // insert the navbar form before the sidebar list
             $nav_content = $(nav_content);
             $navbar_form = $(navbar_form);
+            $navbar_log = $(navbar_log);
             $nav_content.insertBefore($sidebar_nav);
             $navbar_form.insertBefore($nav_content);
+            $sidebar_nav.append($navbar_log);
 
             $(".sidebar-wrapper .dropdown .dropdown-menu > li > a").click(function(event) {
                 event.stopPropagation();
-
             });
 
             // simulate resize so all the charts/maps will be redrawn
@@ -186,7 +189,7 @@ md = {
                 // reset all the additions that we made for the sidebar wrapper only if the screen is bigger than 991px
                 $sidebar_wrapper.find('.navbar-form').remove();
                 $sidebar_wrapper.find('.nav-mobile-menu').remove();
-
+                
                 mobile_menu_initialized = false;
             }
         }
