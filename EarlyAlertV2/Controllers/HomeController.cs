@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using EarlyAlertV2.Models;
+using EarlyAlertV2.ViewModels;
 
 namespace EarlyAlertV2.Controllers
 {

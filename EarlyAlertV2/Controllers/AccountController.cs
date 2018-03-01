@@ -10,9 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using EarlyAlertV2.Models;
-using EarlyAlertV2.Models.AccountViewModels;
+using EarlyAlertV2.ViewModels.AccountViewModels;
 using EarlyAlertV2.Services;
+using EarlyAlertV2.Models;
 
 namespace EarlyAlertV2.Controllers
 {

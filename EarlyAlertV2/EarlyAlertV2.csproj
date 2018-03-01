@@ -9,7 +9,6 @@
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.0.1" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.1" PrivateAssets="All" />
   </ItemGroup>
 
@@ -23,6 +22,7 @@
     <ProjectReference Include="..\EarlyAlertV2.BLL\EarlyAlertV2.BLL.csproj" />
     <ProjectReference Include="..\EarlyAlertV2.Interfaces\EarlyAlertV2.Interfaces.csproj" />
     <ProjectReference Include="..\EarlyAlertV2.Models\EarlyAlertV2.Models.csproj" />
+    <ProjectReference Include="..\EarlyAlertV2.Repository\EarlyAlertV2.Repository.csproj" />
     <ProjectReference Include="..\RSS.Providers.Canvas\RSS.Providers.Canvas.csproj" />
   </ItemGroup>
 

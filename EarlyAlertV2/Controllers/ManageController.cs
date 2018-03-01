@@ -10,9 +10,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using EarlyAlertV2.Models;
-using EarlyAlertV2.Models.ManageViewModels;
+using EarlyAlertV2.ViewModels;
+using EarlyAlertV2.ViewModels.ManageViewModels;
 using EarlyAlertV2.Services;
+using EarlyAlertV2.Models;
 
 namespace EarlyAlertV2.Controllers
 {

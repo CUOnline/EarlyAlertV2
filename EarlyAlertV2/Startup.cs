@@ -8,11 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using EarlyAlertV2.Data;
 using EarlyAlertV2.Models;
 using EarlyAlertV2.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using RSS.Providers.Canvas;
+using EarlyAlertV2.ViewModels;
+using EarlyAlertV2.Repository;
+using EarlyAlertV2.Repository.SeedData;
 
 namespace EarlyAlertV2
 {
@@ -47,11 +49,11 @@ namespace EarlyAlertV2
                 options.ClientSecret = canvasOAuth.ClientSecret;
             });
 
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<EarlyAlertV2Context>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddEntityFrameworkStores<EarlyAlertV2Context>()
                 .AddDefaultTokenProviders();
 
             // Add application services.
@@ -84,6 +86,11 @@ namespace EarlyAlertV2
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+
+            AdminAccount adminAccount = new AdminAccount();
+            Configuration.GetSection(nameof(AdminAccount)).Bind(adminAccount);
+            Seeder.SeedIt(app.ApplicationServices, adminAccount.UserName, adminAccount.Password);
         }
     }
 }
