@@ -5,12 +5,26 @@ using RSS.Clients.Canvas.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using RSS.Clients.Canvas.Clients;
 
 namespace RSS.Clients.Canvas
 {
     public class CanvasClient : ICanvasClient
     {
-        public static readonly Uri CanvasApiUrl = new Uri("https://ucdenver.test.instructure.com/api/v1/");
+        public CanvasClient(Uri baseAddress, string oauthToken)
+            : this(new Connection(baseAddress, new InMemoryCredentialStore(new Credentials(oauthToken, Authentication.AuthenticationType.Oauth))))
+        {
+
+        }
+
+        public CanvasClient(IConnection connection)
+        {
+            Connection = Connection;
+            var apiConnection = new ApiConnection(connection);
+
+            CoursesClient = new CoursesClient(apiConnection);
+            UsersClient = new UsersClient(apiConnection);
+        }
 
         public void SetRequestTimeout(TimeSpan timeout)
         {
@@ -37,7 +51,15 @@ namespace RSS.Clients.Canvas
 
         public Uri BaseAddress
         {
-            get { return Connection.BaseAddress; }
+            get
+            {
+                return Connection.BaseAddress;
+            }
+            //set
+            //{
+            //    Ensure.ArgumentNotNull(value, "value");
+            //    Connection.BaseAddress = value;
+            //}
         }
 
         public IConnection Connection { get; private set; }

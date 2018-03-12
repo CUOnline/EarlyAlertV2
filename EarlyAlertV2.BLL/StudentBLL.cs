@@ -19,6 +19,7 @@ namespace EarlyAlertV2.BLL
 
         public Student Add(Student model)
         {
+            model.DateCreated = DateTime.Now;
             return studentRepository.Add(model);
         }
 

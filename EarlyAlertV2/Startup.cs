@@ -15,6 +15,10 @@ using RSS.Providers.Canvas;
 using EarlyAlertV2.ViewModels;
 using EarlyAlertV2.Repository;
 using EarlyAlertV2.Repository.SeedData;
+using RSS.Clients.Canvas;
+using EarlyAlertV2.BLL;
+using EarlyAlertV2.Interfaces.BLL;
+using EarlyAlertV2.Interfaces.Repository;
 
 namespace EarlyAlertV2
 {
@@ -58,6 +62,17 @@ namespace EarlyAlertV2
 
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
+
+            // BLLs
+            services.AddTransient<IReportBLL, ReportBLL>();
+
+            // Repositories
+            services.AddTransient<IReportRepository, ReportRepository>();
+
+            CanvasApiAuth canvasApiAuth = new CanvasApiAuth();
+            Configuration.GetSection(nameof(CanvasApiAuth)).Bind(canvasApiAuth);
+
+            services.AddTransient<ICanvasClient>(s => new CanvasClient(new Uri(canvasApiAuth.BaseUrl), canvasApiAuth.ApiKey));
 
             services.AddMvc();
         }

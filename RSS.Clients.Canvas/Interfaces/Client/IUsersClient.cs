@@ -8,7 +8,9 @@ namespace RSS.Clients.Canvas.Interfaces.Client
 {
     public interface IUsersClient
     {
-        Task<UserResult> Get(string userId);
+        Task<UserResult> Get(int id);
+
+        Task<UserResult> Get(string sisUserId);
 
         ICoursesClient Courses { get; }
     }

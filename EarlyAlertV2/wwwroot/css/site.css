@@ -13,6 +13,11 @@
         }
 }
 
+.form-group input[type=file] {
+    opacity: inherit;
+    position: inherit;
+}
+
 #map {
     position: relative;
     width: 100%;

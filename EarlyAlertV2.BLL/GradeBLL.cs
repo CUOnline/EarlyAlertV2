@@ -19,6 +19,7 @@ namespace EarlyAlertV2.BLL
 
         public Grade Add(Grade model)
         {
+            model.DateCreated = DateTime.Now;
             return gradeRepository.Add(model);
         }
 

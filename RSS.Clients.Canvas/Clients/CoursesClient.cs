@@ -25,6 +25,11 @@ namespace RSS.Clients.Canvas.Clients
 
             return ApiConnection.Get<CourseResult>(ApiUrls.Course(courseId));
         }
+
+        /// <summary>
+        /// Get a list of courses where the given user is currently enrolled
+        /// </summary>
+        public Task<List<CourseResult>> GetAll(string userId)
     }
 }
 

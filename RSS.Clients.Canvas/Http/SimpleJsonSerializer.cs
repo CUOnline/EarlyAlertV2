@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using RSS.Clients.Canvas.Interfaces.Http;
@@ -12,7 +11,7 @@ namespace RSS.Clients.Canvas.Http
 {
     public class SimpleJsonSerializer : IJsonSerializer
     {
-        static readonly GitHubSerializerStrategy _serializationStrategy = new GitHubSerializerStrategy();
+        static readonly CanvasSerializerStrategy _serializationStrategy = new CanvasSerializerStrategy();
 
         public string Serialize(object item)
         {
@@ -34,7 +33,7 @@ namespace RSS.Clients.Canvas.Http
             return _serializationStrategy.DeserializeEnumHelper(value, type);
         }
 
-        class GitHubSerializerStrategy : PocoJsonSerializerStrategy
+        class CanvasSerializerStrategy : PocoJsonSerializerStrategy
         {
             readonly List<string> _membersWhichShouldPublishNull = new List<string>();
             ConcurrentDictionary<Type, ConcurrentDictionary<object, object>> _cachedEnums = new ConcurrentDictionary<Type, ConcurrentDictionary<object, object>>();
@@ -105,8 +104,6 @@ namespace RSS.Clients.Canvas.Http
                 return SerializeEnum(p);
             }
 
-            [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase",
-                Justification = "The API expects lowercase values")]
             protected override object SerializeEnum(Enum p)
             {
                 return p.ToParameter();

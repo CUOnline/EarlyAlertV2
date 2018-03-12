@@ -15,6 +15,7 @@ namespace EarlyAlertV2.Repository
         public DbSet<Grade> Grades { get; set; }
         public DbSet<Class> Classes { get; set; }
         public DbSet<Assignment> Assignments { get; set; }
+        public DbSet<Report> Reports { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

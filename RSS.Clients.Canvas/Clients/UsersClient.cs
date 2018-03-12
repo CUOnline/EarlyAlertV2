@@ -19,11 +19,18 @@ namespace RSS.Clients.Canvas.Clients
 
         public ICoursesClient Courses { get; private set; }
 
-        public Task<UserResult> Get(string userId)
+        public Task<UserResult> Get(int id)
         {
-            Ensure.ArgumentNotNull(userId, "userId");
+            Ensure.ArgumentNotNull(id, "userId");
 
-            return ApiConnection.Get<UserResult>(ApiUrls.User(userId));
+            return ApiConnection.Get<UserResult>(ApiUrls.User(id));
+        }
+
+        public Task<UserResult> Get(string sisUserId)
+        {
+            Ensure.ArgumentNotNull(sisUserId, "sisUserId");
+
+            return ApiConnection.Get<UserResult>(ApiUrls.User(sisUserId));
         }
     }
 }

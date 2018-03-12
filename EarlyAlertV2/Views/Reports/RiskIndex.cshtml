@@ -1,4 +1,6 @@
-﻿
+﻿@using EarlyAlertV2.ViewModels.ReportViewModels
+@model RiskIndexReportViewModel
+
 <div class="row">
     <div class="col-md-12">
         <div class="card">
@@ -16,9 +18,11 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @foreach (var user in Model.Users)
+                        {
                         <tr>
-                            <td>100058</td>
-                            <td>Dakota Rice</td>
+                            <td>@user.Id</td>
+                            <td>@user.Name</td>
                             <td>
                                 <div class="progress">
                                     <div class="progress-bar progress-bar-success" role="progressbar" style="width: 40%">
@@ -30,76 +34,7 @@
                                 </div>
                             </td>
                         </tr>
-                        <tr>
-                            <td>104582</td>
-                            <td>Minerva Hooper</td>
-                            <td>
-                                <div class="progress">
-                                    <div class="progress-bar progress-bar-success" role="progressbar" style="width: 20%">
-                                    </div>
-                                    <div class="progress-bar progress-bar-info" role="progressbar" style="width: 15%">
-                                    </div>
-                                    <div class="progress-bar progress-bar-warning" role="progressbar" style="width: 10%">
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>108875</td>
-                            <td>Sage Rodriguez</td>
-                            <td>
-                                <div class="progress">
-                                    <div class="progress-bar progress-bar-success" role="progressbar" style="width: 10%">
-                                    </div>
-                                    <div class="progress-bar progress-bar-info" role="progressbar" style="width: 10%">
-                                    </div>
-                                    <div class="progress-bar progress-bar-warning" role="progressbar" style="width: 12%">
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>101569</td>
-                            <td>Philip Chaney</td>
-                            <td>
-                                <div class="progress">
-                                    <div class="progress-bar progress-bar-success" role="progressbar" style="width: 8%">
-                                    </div>
-                                    <div class="progress-bar progress-bar-info" role="progressbar" style="width: 10%">
-                                    </div>
-                                    <div class="progress-bar progress-bar-warning" role="progressbar" style="width: 10%">
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>103468</td>
-                            <td>Doris Greene</td>
-                            <td>
-                                <div class="progress">
-                                    <div class="progress-bar progress-bar-success" role="progressbar" style="width: 10%">
-                                    </div>
-                                    <div class="progress-bar progress-bar-info" role="progressbar" style="width: 4%">
-                                    </div>
-                                    <div class="progress-bar progress-bar-warning" role="progressbar" style="width: 2%">
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>108756</td>
-                            <td>Mason Porter</td>
-                            <td>
-                                <div class="progress">
-                                    <div class="progress-bar progress-bar-success" role="progressbar" style="width: 5%">
-                                    </div>
-                                    <div class="progress-bar progress-bar-info" role="progressbar" style="width: 4%">
-                                    </div>
-                                    <div class="progress-bar progress-bar-warning" role="progressbar" style="width: 2%">
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
+                        }
                     </tbody>
                 </table>
             </div>

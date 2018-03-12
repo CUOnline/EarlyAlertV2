@@ -23,9 +23,14 @@ namespace RSS.Clients.Canvas.Helpers
             return "users/{0}/courses".FormatUri(userId);
         }
 
-        public static Uri User(string userId)
+        public static Uri User(int id)
         {
-            return "users/{0}".FormatUri(userId);
+            return "users/{0}".FormatUri(id);
+        }
+
+        public static Uri User(string sisUserId)
+        {
+            return "users/sis_user_id:{0}".FormatUri(sisUserId);
         }
 
         public static Uri Courses(string userId, bool includeGrading)

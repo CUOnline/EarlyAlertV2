@@ -22,27 +22,26 @@ namespace RSS.Clients.Canvas.Http
     /// </summary>
     public class Connection : IConnection
     {
-        static readonly Uri _defaultCanvasApiUrl = CanvasClient.CanvasApiUrl;
+        private readonly Uri _defaultCanvasApiUrl;
+        private readonly Authenticator _authenticator;
+        private readonly JsonHttpPipeline _jsonPipeline;
+        private readonly IHttpClient _httpClient;
 
-        readonly Authenticator _authenticator;
-        readonly JsonHttpPipeline _jsonPipeline;
-        readonly IHttpClient _httpClient;
-
-        /// <summary>
-        /// Creates a new connection instance used to make requests of the GitHub API.
-        /// </summary>
-        /// <remarks>
-        /// See more information regarding User-Agent requirements here: https://developer.github.com/v3/#user-agent-required
-        /// </remarks>
-        /// <param name="productInformation">
-        /// The name (and optionally version) of the product using this library, the name of your GitHub organization, or your GitHub username (in that order of preference). This is sent to the server as part of
-        /// the user agent for analytics purposes, and used by GitHub to contact you if there are problems.
-        /// </param>
-        /// <param name="credentialStore">Provides credentials to the client when making requests</param>
-        public Connection(ICredentialStore credentialStore)
-            : this(_defaultCanvasApiUrl, credentialStore)
-        {
-        }
+        ///// <summary>
+        ///// Creates a new connection instance used to make requests of the GitHub API.
+        ///// </summary>
+        ///// <remarks>
+        ///// See more information regarding User-Agent requirements here: https://developer.github.com/v3/#user-agent-required
+        ///// </remarks>
+        ///// <param name="productInformation">
+        ///// The name (and optionally version) of the product using this library, the name of your GitHub organization, or your GitHub username (in that order of preference). This is sent to the server as part of
+        ///// the user agent for analytics purposes, and used by GitHub to contact you if there are problems.
+        ///// </param>
+        ///// <param name="credentialStore">Provides credentials to the client when making requests</param>
+        //public Connection(ICredentialStore credentialStore)
+        //    : this(_defaultCanvasApiUrl, credentialStore)
+        //{
+        //}
 
         /// <summary>
         /// Creates a new connection instance used to make requests of the GitHub API.
@@ -513,9 +512,9 @@ namespace RSS.Clients.Canvas.Http
         /// <summary>
         /// Base address for the connection.
         /// </summary>
-        public Uri BaseAddress { get; private set; }
+        public Uri BaseAddress { get; }
 
-        public string UserAgent { get; private set; }
+        //public string UserAgent { get; private set; }
 
         /// <summary>
         /// Gets the <seealso cref="ICredentialStore"/> used to provide credentials for the connection.
@@ -566,7 +565,7 @@ namespace RSS.Clients.Canvas.Http
         // THIS IS THE METHOD THAT EVERY REQUEST MUST GO THROUGH!
         async Task<IResponse> RunRequest(IRequest request, CancellationToken cancellationToken)
         {
-            request.Headers.Add("User-Agent", UserAgent);
+            //request.Headers.Add("User-Agent", UserAgent);
             await _authenticator.Apply(request).ConfigureAwait(false);
             var response = await _httpClient.Send(request, cancellationToken).ConfigureAwait(false);
             if (response != null)

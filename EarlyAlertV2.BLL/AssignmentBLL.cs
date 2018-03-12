@@ -19,6 +19,7 @@ namespace EarlyAlertV2.BLL
 
         public Assignment Add(Assignment model)
         {
+            model.DateCreated = DateTime.Now;
             return assignmentRepository.Add(model);
         }
 
