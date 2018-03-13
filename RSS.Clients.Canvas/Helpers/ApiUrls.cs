@@ -18,7 +18,7 @@ namespace RSS.Clients.Canvas.Helpers
         /// <summary>
         /// List Courses for a user
         /// </summary>
-        public static Uri AllCourses(string userId)
+        public static Uri UserCourses(int userId)
         {
             return "users/{0}/courses".FormatUri(userId);
         }
@@ -32,17 +32,6 @@ namespace RSS.Clients.Canvas.Helpers
         {
             return "users/sis_user_id:{0}".FormatUri(sisUserId);
         }
-
-        public static Uri Courses(string userId, bool includeGrading)
-        {
-            //https://canvas.instructure.com/doc/api/all_resources.html#method.courses.user_index
-            return "users/{0}/courses".FormatUri(userId);
-        }
-
-
-
-
-
 
 
 

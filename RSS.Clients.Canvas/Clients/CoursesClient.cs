@@ -29,7 +29,16 @@ namespace RSS.Clients.Canvas.Clients
         /// <summary>
         /// Get a list of courses where the given user is currently enrolled
         /// </summary>
-        public Task<List<CourseResult>> GetAll(string userId)
+        public Task<IReadOnlyList<CourseResult>> GetAll(int userId, bool includeTotalScores)
+        {
+            var parameters = new Dictionary<string, string>();
+            if (includeTotalScores)
+            {
+                parameters.Add("include[]", "total_scores");
+            }
+
+            return ApiConnection.GetAll<CourseResult>(ApiUrls.UserCourses(userId), parameters);
+        }
     }
 }
 

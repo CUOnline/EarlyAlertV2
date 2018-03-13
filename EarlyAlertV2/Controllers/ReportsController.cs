@@ -80,12 +80,16 @@ namespace EarlyAlertV2.Controllers
                     try
                     {
                         model.Users.Add(await canvasClient.UsersClient.Get(studentSidId));
-
                     }
                     catch (Exception ex)
                     {
                         // 404 not found?
                     }
+                }
+
+                foreach(var user in model.Users)
+                {
+                    var courses = await canvasClient.UsersClient.Courses.GetAll(user.Id, true);
                 }
             }
 
