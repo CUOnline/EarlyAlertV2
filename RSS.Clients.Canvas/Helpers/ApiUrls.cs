@@ -16,6 +16,14 @@ namespace RSS.Clients.Canvas.Helpers
         }
 
         /// <summary>
+        /// List assignments in course.
+        /// </summary>
+        public static Uri CourseAssignments(int courseId)
+        {
+            return "courses/{0}/assignments".FormatUri(courseId);
+        }
+
+        /// <summary>
         /// List Courses for a user
         /// </summary>
         public static Uri UserCourses(int userId)
@@ -32,6 +40,21 @@ namespace RSS.Clients.Canvas.Helpers
         {
             return "users/sis_user_id:{0}".FormatUri(sisUserId);
         }
+        
+        public static Uri Assignment(int assignmentId)
+        {
+            return "assignments/{0}".FormatUri(assignmentId);
+        }
+
+        public static Uri UserSubmissions(int courseId)
+        {
+            return "courses/{0}/students/submissions".FormatUri(courseId);
+        }
+
+        public static Uri AssignmentGroups(int courseId)
+        {
+            return "courses/{0}/assignment_groups".FormatUri(courseId);
+        }
 
 
 
@@ -44,6 +67,7 @@ namespace RSS.Clients.Canvas.Helpers
             return "repositories".FormatUri();
         }
 
+
         /// <summary>
         /// Returns the <see cref="Uri"/> that returns all public repositories in
         /// response to a GET request.
@@ -53,5 +77,7 @@ namespace RSS.Clients.Canvas.Helpers
         {
             return "repositories?since={0}".FormatUri(since);
         }
+
+
     }
 }

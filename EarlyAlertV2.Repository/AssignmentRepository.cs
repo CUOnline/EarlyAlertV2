@@ -27,6 +27,11 @@ namespace EarlyAlertV2.Repository
             return Context.Assignments.Find(modelId);
         }
 
+        public Assignment GetByCanvasId(int canvasId)
+        {
+            return Context.Assignments.FirstOrDefault(x => x.CanvasId == canvasId);
+        }
+
         public Assignment Update(Assignment model)
         {
             Context.Assignments.Update(model);

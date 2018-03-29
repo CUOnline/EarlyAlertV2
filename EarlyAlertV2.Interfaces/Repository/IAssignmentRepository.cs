@@ -4,6 +4,6 @@ namespace EarlyAlertV2.Interfaces.Repository
 {
     public interface IAssignmentRepository : IRepository<Assignment>
     {
-        
+        Assignment GetByCanvasId(int canvasId);
     }
 }

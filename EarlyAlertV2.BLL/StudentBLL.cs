@@ -38,5 +38,15 @@ namespace EarlyAlertV2.BLL
             model.LastUpdated = DateTime.Now;
             return studentRepository.Update(model);
         }
+
+        public Student GetByCanvasId(int canvasId)
+        {
+            return studentRepository.GetByCanvasId(canvasId);
+        }
+
+        public Student GetBySisId(string sisId)
+        {
+            return studentRepository.GetBySisId(sisId);
+        }
     }
 }

@@ -10,7 +10,7 @@ namespace RSS.Clients.Canvas.Http
     {
         const RegexOptions regexOptions = RegexOptions.IgnoreCase;
 
-        static readonly Regex _linkRelRegex = new Regex("rel=\"(next|prev|first|last)\"", regexOptions);
+        static readonly Regex _linkRelRegex = new Regex("rel=\"(current|next|prev|first|last)\"", regexOptions);
         static readonly Regex _linkUriRegex = new Regex("<(.+)>", regexOptions);
 
         public static ApiInfo ParseResponseHeaders(IDictionary<string, string> responseHeaders)

@@ -1,5 +1,6 @@
 using EarlyAlertV2.Interfaces.Repository;
 using EarlyAlertV2.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,7 +25,22 @@ namespace EarlyAlertV2.Repository
 
         public Student Get(int modelId)
         {
-            return Context.Students.Find(modelId);
+            return Context.Students
+                .Include(x => x.StudentCourses)
+                    .ThenInclude(x => x.Course)
+                        .ThenInclude(x => x.Assignments)
+                .Include(x => x.StudentAssignmentSubmissions)
+                .FirstOrDefault(x => x.Id == modelId);
+        }
+
+        public Student GetBySisId(string sisId)
+        {
+            return Context.Students.FirstOrDefault(x => x.SISUserId == sisId);
+        }
+
+        public Student GetByCanvasId(int canvasId)
+        {
+            return Context.Students.FirstOrDefault(x => x.CanvasId == canvasId);
         }
 
         public Student Update(Student model)

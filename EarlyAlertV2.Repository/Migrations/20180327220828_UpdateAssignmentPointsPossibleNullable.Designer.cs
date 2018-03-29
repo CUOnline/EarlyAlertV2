@@ -12,9 +12,10 @@ using System;
 namespace EarlyAlertV2.Repository.Migrations
 {
     [DbContext(typeof(EarlyAlertV2Context))]
-    partial class EarlyAlertV2ContextModelSnapshot : ModelSnapshot
+    [Migration("20180327220828_UpdateAssignmentPointsPossibleNullable")]
+    partial class UpdateAssignmentPointsPossibleNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,8 +82,6 @@ namespace EarlyAlertV2.Repository.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("AssignmentGroupId");
-
                     b.Property<int>("CanvasId");
 
                     b.Property<int>("CourseId");
@@ -105,35 +104,9 @@ namespace EarlyAlertV2.Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssignmentGroupId");
-
                     b.HasIndex("CourseId");
 
                     b.ToTable("Assignments");
-                });
-
-            modelBuilder.Entity("EarlyAlertV2.Models.AssignmentGroup", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("CanvasId");
-
-                    b.Property<int>("CourseId");
-
-                    b.Property<DateTime>("DateCreated");
-
-                    b.Property<double>("GroupWeight");
-
-                    b.Property<DateTime?>("LastUpdated");
-
-                    b.Property<string>("Name");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.ToTable("AssignmentGroups");
                 });
 
             modelBuilder.Entity("EarlyAlertV2.Models.Course", b =>
@@ -233,7 +206,7 @@ namespace EarlyAlertV2.Repository.Migrations
 
                     b.Property<DateTime>("DateCreated");
 
-                    b.Property<bool?>("Excused");
+                    b.Property<bool>("Excused");
 
                     b.Property<DateTime?>("LastUpdated");
 
@@ -379,21 +352,8 @@ namespace EarlyAlertV2.Repository.Migrations
 
             modelBuilder.Entity("EarlyAlertV2.Models.Assignment", b =>
                 {
-                    b.HasOne("EarlyAlertV2.Models.AssignmentGroup", "AssignmentGroup")
-                        .WithMany("Assignments")
-                        .HasForeignKey("AssignmentGroupId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("EarlyAlertV2.Models.Course", "Course")
                         .WithMany("Assignments")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("EarlyAlertV2.Models.AssignmentGroup", b =>
-                {
-                    b.HasOne("EarlyAlertV2.Models.Course", "Course")
-                        .WithMany()
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -406,7 +366,7 @@ namespace EarlyAlertV2.Repository.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("EarlyAlertV2.Models.Student", "Student")
-                        .WithMany("StudentAssignmentSubmissions")
+                        .WithMany()
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

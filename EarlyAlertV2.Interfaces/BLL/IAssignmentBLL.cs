@@ -4,6 +4,6 @@ namespace EarlyAlertV2.Interfaces.BLL
 {
     public interface IAssignmentBLL : IBLL<Assignment>
     {
-        
+        Assignment GetByCanvasId(int canvasId);
     }
 }

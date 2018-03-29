@@ -29,7 +29,7 @@ namespace RSS.Clients.Canvas.Clients
         /// <summary>
         /// Get a list of courses where the given user is currently enrolled
         /// </summary>
-        public Task<IReadOnlyList<CourseResult>> GetAll(int userId, bool includeTotalScores)
+        public Task<IReadOnlyList<CourseResult>> GetAll(int userId, bool includeTotalScores, bool activeCourses)
         {
             var parameters = new Dictionary<string, string>();
             if (includeTotalScores)
@@ -37,7 +37,31 @@ namespace RSS.Clients.Canvas.Clients
                 parameters.Add("include[]", "total_scores");
             }
 
+            if (activeCourses)
+            {
+                parameters.Add("enrollment_state", "active");
+            }
+
             return ApiConnection.GetAll<CourseResult>(ApiUrls.UserCourses(userId), parameters);
+        }
+
+        public Task<IReadOnlyList<UserSubmissionsResult>> GetAllUserSubmissions(List<int> userId, int courseId)
+        {
+            var parameters = new Dictionary<string, string>();
+
+            parameters.Add("grouped", "1");
+            parameters.Add("student_ids[]", string.Join(",", userId));
+            
+            return ApiConnection.GetAll<UserSubmissionsResult>(ApiUrls.UserSubmissions(courseId), parameters);
+        }
+
+        public Task<IReadOnlyList<AssignmentGroupResult>> GetAllAssignmentGroups(int courseId)
+        {
+            var parameters = new Dictionary<string, string>();
+
+            parameters.Add("include[]", "assignments");
+            
+            return ApiConnection.GetAll<AssignmentGroupResult>(ApiUrls.AssignmentGroups(courseId), parameters);
         }
     }
 }

@@ -1344,7 +1344,14 @@ namespace RSS.Clients.Canvas
                                 object jsonValue;
                                 if (jsonObject.TryGetValue(setter.Key, out jsonValue))
                                 {
-                                    jsonValue = DeserializeObject(jsonValue, setter.Value.Key);
+                                    try
+                                    {
+                                        jsonValue = DeserializeObject(jsonValue, setter.Value.Key);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        throw new Exception($"Failed to deserialize {setter.Key}.  Value: {jsonValue}");
+                                    }
                                     setter.Value.Value(obj, jsonValue);
                                 }
                             }
@@ -1613,11 +1620,8 @@ namespace RSS.Clients.Canvas
                 return (genericDefinition == typeof(IList<>)
                     || genericDefinition == typeof(ICollection<>)
                     || genericDefinition == typeof(IEnumerable<>)
-#if SIMPLE_JSON_READONLY_COLLECTIONS
                     || genericDefinition == typeof(IReadOnlyCollection<>)
-                    || genericDefinition == typeof(IReadOnlyList<>)
-#endif
-                    );
+                    || genericDefinition == typeof(IReadOnlyList<>));
             }
 
             public static bool IsAssignableFrom(Type type1, Type type2)

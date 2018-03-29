@@ -12,6 +12,10 @@ namespace RSS.Clients.Canvas.Interfaces.Client
 
         IAssignmentsClient Assignments { get; }
 
-        Task<IReadOnlyList<CourseResult>> GetAll(int userId, bool includeTotalScores);
+        Task<IReadOnlyList<CourseResult>> GetAll(int userId, bool includeTotalScores, bool activeCourses);
+
+        Task<IReadOnlyList<UserSubmissionsResult>> GetAllUserSubmissions(List<int> userId, int courseId);
+
+        Task<IReadOnlyList<AssignmentGroupResult>> GetAllAssignmentGroups(int courseId);
     }
 }

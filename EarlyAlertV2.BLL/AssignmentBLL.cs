@@ -33,6 +33,11 @@ namespace EarlyAlertV2.BLL
             return assignmentRepository.Get(modelId);
         }
 
+        public Assignment GetByCanvasId(int canvasId)
+        {
+            return assignmentRepository.GetByCanvasId(canvasId);
+        }
+
         public Assignment Update(Assignment model)
         {
             model.LastUpdated = DateTime.Now;

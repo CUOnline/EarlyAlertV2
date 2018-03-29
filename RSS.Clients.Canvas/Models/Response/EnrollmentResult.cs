@@ -7,13 +7,13 @@
         public int RoleId { get; set; }
         public int UserId { get; set; }
         public string EnrollmentState { get; set; }
-        public double? ComputedCurrentScore { get; set; }
-        public double? ComputedFinalScore { get; set; }
-        public double? ComputedCurrentGrade { get; set; }
-        public double? ComputedFinalGrade { get; set; }
-        public double? UnpostedCurrentScore { get; set; }
-        public double? UnpostedFinalScore { get; set; }
-        public double? UnpostedCurrentGrade { get; set; }
-        public double? UnpostedFinalGrade { get; set; }
+        public string ComputedCurrentScore { get; set; }
+        public string ComputedFinalScore { get; set; }
+        public string ComputedCurrentGrade { get; set; }
+        public string ComputedFinalGrade { get; set; }
+        public string UnpostedCurrentScore { get; set; }
+        public string UnpostedFinalScore { get; set; }
+        public string UnpostedCurrentGrade { get; set; }
+        public string UnpostedFinalGrade { get; set; }
     }
 }

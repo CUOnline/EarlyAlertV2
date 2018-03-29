@@ -64,10 +64,22 @@ namespace EarlyAlertV2
             services.AddTransient<IEmailSender, EmailSender>();
 
             // BLLs
-            services.AddTransient<IReportBLL, ReportBLL>();
+            services.AddScoped<IAssignmentBLL, AssignmentBLL>();
+            services.AddScoped<ICourseBLL, CourseBLL>();
+            services.AddScoped<IGradeBLL, GradeBLL>();
+            services.AddScoped<IReportBLL, ReportBLL>();
+            services.AddScoped<IStudentAssignmentSubmissionBLL, StudentAssignmentSubmissionBLL>();
+            services.AddScoped<IStudentBLL, StudentBLL>();
+            services.AddScoped<IAssignmentGroupBLL, AssignmentGroupBLL>();
 
             // Repositories
-            services.AddTransient<IReportRepository, ReportRepository>();
+            services.AddScoped<IAssignmentRepository, AssignmentRepository>();
+            services.AddScoped<ICourseRepository, CourseRepository>();
+            services.AddScoped<IGradeRepository, GradeRepository>();
+            services.AddScoped<IReportRepository, ReportRepository>();
+            services.AddScoped<IStudentAssignmentSubmissionRepository, StudentAssignmentSubmissionRepository>();
+            services.AddScoped<IStudentRepository, StudentRepository>();
+            services.AddScoped<IAssignmentGroupRepository, AssignmentGroupRepository>();
 
             CanvasApiAuth canvasApiAuth = new CanvasApiAuth();
             Configuration.GetSection(nameof(CanvasApiAuth)).Bind(canvasApiAuth);
@@ -105,7 +117,7 @@ namespace EarlyAlertV2
 
             AdminAccount adminAccount = new AdminAccount();
             Configuration.GetSection(nameof(AdminAccount)).Bind(adminAccount);
-            Seeder.SeedIt(app.ApplicationServices, adminAccount.UserName, adminAccount.Password);
+            //Seeder.SeedIt(app.ApplicationServices, adminAccount.UserName, adminAccount.Password);
         }
     }
 }

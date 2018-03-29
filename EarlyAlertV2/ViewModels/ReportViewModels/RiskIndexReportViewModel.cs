@@ -10,5 +10,6 @@ namespace EarlyAlertV2.ViewModels.ReportViewModels
     {
         public int ReportId { get; set; }
         public List<UserResult> Users { get; set; }
+        public List<EnrollmentResult> EnrollmentResults { get; set; }
     }
 }
