@@ -27,6 +27,13 @@ namespace EarlyAlertV2.Repository
             return Context.Grades.Find(modelId);
         }
 
+        public Grade GetByCourseAndStudent(int courseId, int studentId)
+        {
+            return Context.Grades
+                .Where(x => x.CourseId == courseId && x.StudentId == studentId)
+                .FirstOrDefault();
+        }
+
         public Grade Update(Grade model)
         {
             Context.Grades.Update(model);

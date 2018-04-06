@@ -1,4 +1,5 @@
-﻿using RSS.Clients.Canvas.Models.Response;
+﻿using EarlyAlertV2.Models;
+using RSS.Clients.Canvas.Models.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace EarlyAlertV2.ViewModels.ReportViewModels
     public class RiskIndexReportViewModel
     {
         public int ReportId { get; set; }
-        public List<UserResult> Users { get; set; }
-        public List<EnrollmentResult> EnrollmentResults { get; set; }
+        public List<Student> Users { get; set; }
+        public Dictionary<int, double> UserRiskIndicies { get; set; }
     }
 }

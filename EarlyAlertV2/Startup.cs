@@ -71,6 +71,7 @@ namespace EarlyAlertV2
             services.AddScoped<IStudentAssignmentSubmissionBLL, StudentAssignmentSubmissionBLL>();
             services.AddScoped<IStudentBLL, StudentBLL>();
             services.AddScoped<IAssignmentGroupBLL, AssignmentGroupBLL>();
+            services.AddScoped<IGradeBLL, GradeBLL>();
 
             // Repositories
             services.AddScoped<IAssignmentRepository, AssignmentRepository>();
@@ -80,6 +81,7 @@ namespace EarlyAlertV2
             services.AddScoped<IStudentAssignmentSubmissionRepository, StudentAssignmentSubmissionRepository>();
             services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<IAssignmentGroupRepository, AssignmentGroupRepository>();
+            services.AddScoped<IGradeRepository, GradeRepository>();
 
             CanvasApiAuth canvasApiAuth = new CanvasApiAuth();
             Configuration.GetSection(nameof(CanvasApiAuth)).Bind(canvasApiAuth);

@@ -33,6 +33,11 @@ namespace EarlyAlertV2.BLL
             return gradeRepository.Get(modelId);
         }
 
+        public Grade GetByCourseAndStudent(int courseId, int studentId)
+        {
+            return gradeRepository.GetByCourseAndStudent(courseId, studentId);
+        }
+
         public Grade Update(Grade model)
         {
             model.LastUpdated = DateTime.Now;

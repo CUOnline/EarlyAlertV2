@@ -25,10 +25,11 @@ namespace EarlyAlertV2.Controllers
         private readonly IAssignmentBLL assignmentBll;
         private readonly IStudentAssignmentSubmissionBLL studentAssignmentSubmissionBll;
         private readonly IAssignmentGroupBLL assignmentGroupBll;
+        private readonly IGradeBLL gradeBll;
 
         public ReportsController(ICanvasClient canvasClient, IReportBLL reportBll, IStudentBLL studentBll,
             ICourseBLL courseBll, IAssignmentBLL assignmentBll, IStudentAssignmentSubmissionBLL studentAssignmentSubmissionBll,
-            IAssignmentGroupBLL assignmentGroupBll)
+            IAssignmentGroupBLL assignmentGroupBll, IGradeBLL gradeBll)
         {
             this.canvasClient = canvasClient;
             this.reportBll = reportBll;
@@ -37,6 +38,7 @@ namespace EarlyAlertV2.Controllers
             this.assignmentBll = assignmentBll;
             this.studentAssignmentSubmissionBll = studentAssignmentSubmissionBll;
             this.assignmentGroupBll = assignmentGroupBll;
+            this.gradeBll = gradeBll;
         }
 
         public IActionResult Index()
@@ -80,8 +82,8 @@ namespace EarlyAlertV2.Controllers
             var model = new RiskIndexReportViewModel()
             {
                 ReportId = reportId,
-                Users = new List<UserResult>(),
-                EnrollmentResults = new List<EnrollmentResult>()
+                Users = new List<Student>(),
+                UserRiskIndicies = new Dictionary<int, double>()
             };
 
             if (reportId > 0)
@@ -92,7 +94,7 @@ namespace EarlyAlertV2.Controllers
                 var students = await UpdateStudents(report.ReportData);
 
                 if (false)
-                {
+                { 
                     // Determine classes students are currently taking
                     var studentCourses = await UpdateCourses(students);
 
@@ -103,116 +105,91 @@ namespace EarlyAlertV2.Controllers
                     var studentSubmissions = await UpdateStudentSubmissions(students, studentCourses);
                 }
 
+                // OK .... Now... I finally have all the data.  Start calculating scores for students.
                 foreach (var student in students)
                 {
                     var currentStudent = studentBll.Get(student.Id);
                     var activeCourses = currentStudent.StudentCourses.Select(x => x.Course);
-                    
 
                     foreach(var course in activeCourses)
                     {
                         var studentCourseSubmissions = studentAssignmentSubmissionBll.GetAll().Where(x => x.StudentId == currentStudent.Id);
                         var assignmentGroups = assignmentGroupBll.GetAllByCourseId(course.Id);
 
-
-                        List<Tuple<double, double, double>> groupScore = new List<Tuple<double, double, double>>();
-
-                        // If an assigmentgroup exists where the groupweight is set, calculate score using the weight
-                        if(assignmentGroups.Any(x => x.GroupWeight > 0))
-                        {
-                            foreach (var assignmentGroup in assignmentGroups.Where(x => x.GroupWeight > 0))
-                            {
-                                double maxGroupPossible = 0;
-                                double studentGroupScore = 0;
-
-                                var dueAssignments = assignmentGroup.Assignments.Where(x => x.DueAt != null && x.DueAt <= DateTime.Now);
-
-                                if (dueAssignments.Any())
-                                {
-                                    foreach (var assignment in dueAssignments)
-                                    {
-                                        var studentSubmission = studentCourseSubmissions.FirstOrDefault(x => x.AssignmentId == assignment.Id);
-
-                                        if (studentSubmission != null && studentSubmission.Score != null && studentSubmission.WorkflowState != "pending_review")
-                                        {
-                                            studentGroupScore += studentSubmission.Score ?? 0;
-                                            maxGroupPossible += assignment.PointsPossible ?? 0;
-                                        }
-                                    }
-
-                                    groupScore.Add(new Tuple<double, double, double>(studentGroupScore, maxGroupPossible, assignmentGroup.GroupWeight));
-                                }
-                            }
-                        }
-                        else // Otherwise, calculate the score using all of the assignments in the course
+                        // If calculation is using course weights
+                        double average = 0;
+                        if (assignmentGroups.Select(x => x.GroupWeight).Any(weight => weight > 0))
                         {
                             foreach(var assignmentGroup in assignmentGroups)
                             {
-                                double maxGroupPossible = 0;
-                                double studentGroupScore = 0;
+                                average += GetStudentAverage(assignmentGroup.Assignments.ToList(), studentCourseSubmissions.ToList(), assignmentGroup.GroupWeight);
                             }
                         }
-
-
-
-
-                        double studentCourseScore = 0;
-                        double maxCourseScore = 0;
-                        foreach(var score in groupScore)
+                        else // calculate using all due assignments in course.  All assignments count toward 100% of the course.
                         {
-                            if (score.Item2 != 0)
-                            {
-                                studentCourseScore += (score.Item1 / score.Item2) * score.Item3;
-                                maxCourseScore += score.Item3;
-                            }
+                            average = GetStudentAverage(assignmentGroups.SelectMany(x => x.Assignments).ToList(), studentCourseSubmissions.ToList(), 100);
                         }
 
-                        studentCourseScore = (studentCourseScore / maxCourseScore) * 100;
+                        var grade = gradeBll.GetByCourseAndStudent(course.Id, student.Id);
+                        if(grade == null)
+                        {
+                            gradeBll.Add(new Grade()
+                            {
+                                CourseId = course.Id,
+                                StudentId = student.Id,
+                                Value = average
+                            });
+                        }
+                        else
+                        {
+                            grade.Value = average;
+                            gradeBll.Update(grade);
+                        }
                     }
-
-                    // Need to calculate max possible score... summation?
-
-
-                    // For each student
-                        // Calculate score for each course.
-                            // For each assignment group in course
-                                // Get list of due assignments
-                                // Calculate total score of due assignments
-                                // Calculate total score of turned in assignments
-                                // Divide the two
-                                // Multiply score by group weight
-
-
-                    //foreach(var course in activeCourses)
-                    //{
-                    //    var courseDueAssignments = course.Assignments.Where(x => x.DueAt != null && x.DueAt >= DateTime.Now);
-
-                    //    var courseLateAssignments = currentStudent.StudentAssignmentSubmissions?.Where(x => x.Assignment.CourseId == course.Id && x.Late).Count();
-
-
-
-                    //    var courseScore = currentStudent.StudentAssignmentSubmissions?.Where(x => x.Assignment.CourseId == course.Id && x.Score != null).Sum(x => x.Score) 
-                    //        / courseDueAssignments.Where(x => x.PointsPossible != null).Sum(x => x.PointsPossible) * 100;
-                    //}
-
                 }
 
 
-                // OK .... Now... I finally have all the data.  Start calculating scores for students.
 
+                model.Users = students.ToList();
+                
                 foreach(var user in model.Users)
                 {
-                    var userActiveCourses = await canvasClient.UsersClient.Courses.GetAll(user.Id, true, true);
-
-                    foreach(var course in userActiveCourses)
+                    double totalCourseGrade = 0;
+                    foreach (var courseGrade in user.CourseGrades)
                     {
-                        var userSubmissions = await canvasClient.CoursesClient.GetAllUserSubmissions(new List<int>() { user.Id }, course.Id);
-                        model.EnrollmentResults.AddRange(course.Enrollments);
+                        totalCourseGrade += courseGrade.Value;
                     }
+
+                    model.UserRiskIndicies.Add(user.Id, totalCourseGrade / user.CourseGrades.Count);
                 }
             }
 
             return View(model);
+        }
+
+        private double GetStudentAverage(List<Assignment> assignments, List<StudentAssignmentSubmission> studentSubmissions, double weight)
+        {
+            double totalStudentGrade = 0;
+            double maxPossibleGrade = 0;
+            foreach(var assignment in assignments)
+            {
+                var studentAssignmentSubmission = studentSubmissions.FirstOrDefault(x => x.AssignmentId == assignment.Id);
+                if(studentAssignmentSubmission != null && studentAssignmentSubmission.Score != null && studentAssignmentSubmission.WorkflowState == "graded")
+                {
+                    totalStudentGrade += studentAssignmentSubmission.Score.Value;
+                    maxPossibleGrade += studentAssignmentSubmission.Assignment.PointsPossible.Value;
+                }
+            }
+
+            // Handle potential edge case where no assignments are due for a course group. Example: Final Exam
+            if (maxPossibleGrade == 0)
+            {
+                return weight;
+            }
+            else
+            {
+                return (totalStudentGrade / maxPossibleGrade) * weight;
+            }
         }
 
         private async Task<List<Student>> UpdateStudents(string reportData)
@@ -397,6 +374,16 @@ namespace EarlyAlertV2.Controllers
                                     Excused = submission.Excused,
                                     WorkflowState = submission.WorkflowState
                                 });
+                            }
+                            else
+                            {
+                                studentSubmission.Score = submission.Score;
+                                studentSubmission.Late = submission.Late;
+                                studentSubmission.Missing = submission.Missing;
+                                studentSubmission.Excused = submission.Excused;
+                                studentSubmission.WorkflowState = submission.WorkflowState;
+
+                                studentSubmission = studentAssignmentSubmissionBll.Update(studentSubmission);
                             }
 
                             studentAssignmentSubmissions.Add(studentSubmission);

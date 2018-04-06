@@ -18,32 +18,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var user in Model.Users)
+                        @foreach (var index in Model.UserRiskIndicies.OrderByDescending(x => x.Value))
                         {
-                        <tr>
+                            var user = Model.Users.First(x => x.Id == index.Key);
+                            <tr>
                             <td>@user.Id</td>
                             <td>@user.Name</td>
                             <td>
-                                @{ 
-                                    var userEnrollments = Model.EnrollmentResults.Where(x => x.UserId == user.Id);
-
-                                    double? averageGrade = 0;
-                                    //foreach(var enrollment in userEnrollments)
-                                    //{
-                                    //     averageGrade += enrollment.ComputedFinalScore;
-                                    //}
-
-                                    //averageGrade = averageGrade / userEnrollments.Count();
-                                }
-
-                                @averageGrade
-
                                 <div class="progress">
-                                    <div class="progress-bar progress-bar-success" role="progressbar" style="width: 40%">
-                                    </div>
-                                    <div class="progress-bar progress-bar-info" role="progressbar" style="width: 29%">
-                                    </div>
-                                    <div class="progress-bar progress-bar-warning" role="progressbar" style="width: 20%">
+                                    <div class="progress-bar progress-bar-success" role="progressbar" style="width: @index.Value%">
                                     </div>
                                 </div>
                             </td>

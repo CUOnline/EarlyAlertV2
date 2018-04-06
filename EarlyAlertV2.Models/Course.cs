@@ -16,5 +16,6 @@ namespace EarlyAlertV2.Models
         
         public virtual ICollection<StudentCourse> StudentCourses { get; set; }
         public virtual ICollection<Assignment> Assignments { get; set; }
+        public virtual ICollection<Grade> StudentGrades { get; set; }
     }
 }
