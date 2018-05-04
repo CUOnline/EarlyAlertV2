@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using EarlyAlertV2.ViewModels.AccountViewModels;
 using EarlyAlertV2.Services;
 using EarlyAlertV2.Models;
+using EarlyAlertV2.Helpers;
 
 namespace EarlyAlertV2.Controllers
 {
@@ -35,6 +36,121 @@ namespace EarlyAlertV2.Controllers
             _signInManager = signInManager;
             _emailSender = emailSender;
             _logger = logger;
+        }
+
+        [AuthorizeRoles(UserRoles.OITAdminRole, UserRoles.AdminRole)]
+        public async Task<IActionResult> UserAccounts()
+        {
+            var model = new UserAccountsViewModel();
+            model.Users = _userManager.Users
+                                        .Where(x => x.Email != "oitadmin@ucdenver.edu")
+                                        .OrderByDescending(x => x.LockoutEnabled)
+                                        .ThenBy(x => x.FirstName).ToList();
+            return View(model);
+        }
+
+        [HttpPost]
+        [AuthorizeRoles(UserRoles.OITAdminRole, UserRoles.AdminRole)]
+        public async Task<IActionResult> SearchUserAccounts(UserAccountsViewModel model)
+        {
+            if(!string.IsNullOrWhiteSpace(model.SearchFirstName) && !string.IsNullOrWhiteSpace(model.SearchLastName))
+            {
+                model.Users = _userManager.Users.OrderBy(x => x.FirstName).Where(x => x.FirstName.Contains(model.SearchFirstName) && x.LastName.Contains(model.SearchLastName));
+            }
+            else if (!string.IsNullOrWhiteSpace(model.SearchFirstName))
+            {
+                model.Users = _userManager.Users.OrderBy(x => x.FirstName).Where(x => x.FirstName.Contains(model.SearchFirstName));
+            }
+            else if (!string.IsNullOrWhiteSpace(model.SearchLastName))
+            {
+                model.Users = _userManager.Users.OrderBy(x => x.FirstName).Where(x => x.LastName.Contains(model.SearchLastName));
+            }
+            
+            return View(model);
+        }
+
+        public async Task<IActionResult> AddEditUser(string id)
+        {
+            var model = new AddEditUserViewModel();
+
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                var user = await _userManager.FindByIdAsync(id);
+                model = new AddEditUserViewModel()
+                {
+                    UserId = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email
+                };
+
+                var roles = _userManager.GetRolesAsync(user);
+
+                if (roles.Result.Contains(UserRoles.AdminRole)) model.IsAdminRole = true;
+                if (roles.Result.Contains(UserRoles.ReportManagerRole)) model.IsReportManagerRole = true;
+            }
+
+            return PartialView("~/Views/Account/_AddEditUser.cshtml", model);
+        }
+
+        [HttpPost]
+        [AuthorizeRoles(UserRoles.OITAdminRole, UserRoles.AdminRole)]
+        public async Task<IActionResult> AddEditUser(AddEditUserViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                if (!string.IsNullOrWhiteSpace(model.UserId))
+                {
+                    var user = await _userManager.FindByIdAsync(model.UserId);
+
+                    // Strip roles from user
+                    var roles = await _userManager.GetRolesAsync(user);
+                    await _userManager.RemoveFromRolesAsync(user, roles);
+                    
+                    user.FirstName = model.FirstName;
+                    user.LastName = model.LastName;
+                    user.Email = model.Email;
+
+                    await _userManager.UpdateAsync(user);
+
+                    // Add selected roles
+                    if (model.IsAdminRole) await _userManager.AddToRoleAsync(user, UserRoles.AdminRole);
+                    if (model.IsReportManagerRole) await _userManager.AddToRoleAsync(user, UserRoles.ReportManagerRole);
+
+                    return RedirectToAction("UserAccounts");
+                }
+                else
+                {
+                    var user = new ApplicationUser()
+                    {
+                        FirstName = model.FirstName,
+                        LastName = model.LastName,
+                        Email = model.Email,
+                        UserName = model.Email
+                    };
+
+                    var result = await _userManager.CreateAsync(user);
+                    if (result.Succeeded)
+                    {
+                        user = await _userManager.FindByEmailAsync(user.Email);
+
+                        if (model.IsAdminRole) await _userManager.AddToRoleAsync(user, UserRoles.AdminRole);
+                        if (model.IsReportManagerRole) await _userManager.AddToRoleAsync(user, UserRoles.ReportManagerRole);
+
+                        return RedirectToAction("UserAccounts");
+                    }
+                    else
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+                    }
+                }
+            }
+
+            // Todo: Problem here.... We cannot just send the users to the UserAccounts view....
+            return RedirectToAction("UserAccounts", model);
         }
 
         [TempData]
@@ -67,10 +183,7 @@ namespace EarlyAlertV2.Controllers
                     _logger.LogInformation("User logged in.");
                     return RedirectToLocal(returnUrl);
                 }
-                if (result.RequiresTwoFactor)
-                {
-                    return RedirectToAction(nameof(LoginWith2fa), new { returnUrl, model.RememberMe });
-                }
+
                 if (result.IsLockedOut)
                 {
                     _logger.LogWarning("User account locked out.");
@@ -86,159 +199,12 @@ namespace EarlyAlertV2.Controllers
             // If we got this far, something failed, redisplay form
             return View(model);
         }
-
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> LoginWith2fa(bool rememberMe, string returnUrl = null)
-        {
-            // Ensure the user has gone through the username & password screen first
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
-
-            if (user == null)
-            {
-                throw new ApplicationException($"Unable to load two-factor authentication user.");
-            }
-
-            var model = new LoginWith2faViewModel { RememberMe = rememberMe };
-            ViewData["ReturnUrl"] = returnUrl;
-
-            return View(model);
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> LoginWith2fa(LoginWith2faViewModel model, bool rememberMe, string returnUrl = null)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
-            if (user == null)
-            {
-                throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
-
-            var authenticatorCode = model.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty);
-
-            var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, rememberMe, model.RememberMachine);
-
-            if (result.Succeeded)
-            {
-                _logger.LogInformation("User with ID {UserId} logged in with 2fa.", user.Id);
-                return RedirectToLocal(returnUrl);
-            }
-            else if (result.IsLockedOut)
-            {
-                _logger.LogWarning("User with ID {UserId} account locked out.", user.Id);
-                return RedirectToAction(nameof(Lockout));
-            }
-            else
-            {
-                _logger.LogWarning("Invalid authenticator code entered for user with ID {UserId}.", user.Id);
-                ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
-                return View();
-            }
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> LoginWithRecoveryCode(string returnUrl = null)
-        {
-            // Ensure the user has gone through the username & password screen first
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
-            if (user == null)
-            {
-                throw new ApplicationException($"Unable to load two-factor authentication user.");
-            }
-
-            ViewData["ReturnUrl"] = returnUrl;
-
-            return View();
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> LoginWithRecoveryCode(LoginWithRecoveryCodeViewModel model, string returnUrl = null)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
-            if (user == null)
-            {
-                throw new ApplicationException($"Unable to load two-factor authentication user.");
-            }
-
-            var recoveryCode = model.RecoveryCode.Replace(" ", string.Empty);
-
-            var result = await _signInManager.TwoFactorRecoveryCodeSignInAsync(recoveryCode);
-
-            if (result.Succeeded)
-            {
-                _logger.LogInformation("User with ID {UserId} logged in with a recovery code.", user.Id);
-                return RedirectToLocal(returnUrl);
-            }
-            if (result.IsLockedOut)
-            {
-                _logger.LogWarning("User with ID {UserId} account locked out.", user.Id);
-                return RedirectToAction(nameof(Lockout));
-            }
-            else
-            {
-                _logger.LogWarning("Invalid recovery code entered for user with ID {UserId}", user.Id);
-                ModelState.AddModelError(string.Empty, "Invalid recovery code entered.");
-                return View();
-            }
-        }
-
+        
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Lockout()
         {
             return View();
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult Register(string returnUrl = null)
-        {
-            ViewData["ReturnUrl"] = returnUrl;
-            return View();
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
-        {
-            ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid)
-            {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    _logger.LogInformation("User created a new account with password.");
-
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
-                    await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl);
-
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    _logger.LogInformation("User created a new account with password.");
-                    return RedirectToLocal(returnUrl);
-                }
-                AddErrors(result);
-            }
-
-            // If we got this far, something failed, redisplay form
-            return View(model);
         }
 
         [HttpPost]
@@ -265,17 +231,24 @@ namespace EarlyAlertV2.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
         {
-
-
             if (remoteError != null)
             {
                 ErrorMessage = $"Error from external provider: {remoteError}";
                 return RedirectToAction(nameof(Login));
             }
+
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
                 return RedirectToAction(nameof(Login));
+            }
+
+            // Check for account.  If exists, create external signin.
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            var user = await _userManager.FindByEmailAsync(email);
+            if(user != null && !(await _userManager.GetLoginsAsync(user)).Any())
+            {
+                await _userManager.AddLoginAsync(user, info);
             }
 
             // Sign in the user with this external login provider if the user already has a login.
@@ -285,17 +258,14 @@ namespace EarlyAlertV2.Controllers
                 _logger.LogInformation("User logged in with {Name} provider.", info.LoginProvider);
                 return RedirectToLocal(returnUrl);
             }
+
             if (result.IsLockedOut)
             {
                 return RedirectToAction(nameof(Lockout));
             }
             else
             {
-                // If the user does not have an account, then ask the user to create an account.
-                ViewData["ReturnUrl"] = returnUrl;
-                ViewData["LoginProvider"] = info.LoginProvider;
-                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-                return View("ExternalLogin", new ExternalLoginViewModel { Email = email });
+                return RedirectToAction(nameof(AccessDenied));
             }
         }
 
@@ -350,90 +320,6 @@ namespace EarlyAlertV2.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult ForgotPassword()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
-                {
-                    // Don't reveal that the user does not exist or is not confirmed
-                    return RedirectToAction(nameof(ForgotPasswordConfirmation));
-                }
-
-                // For more information on how to enable account confirmation and password reset please
-                // visit https://go.microsoft.com/fwlink/?LinkID=532713
-                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var callbackUrl = Url.ResetPasswordCallbackLink(user.Id, code, Request.Scheme);
-                await _emailSender.SendEmailAsync(model.Email, "Reset Password",
-                   $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
-                return RedirectToAction(nameof(ForgotPasswordConfirmation));
-            }
-
-            // If we got this far, something failed, redisplay form
-            return View(model);
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult ForgotPasswordConfirmation()
-        {
-            return View();
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult ResetPassword(string code = null)
-        {
-            if (code == null)
-            {
-                throw new ApplicationException("A code must be supplied for password reset.");
-            }
-            var model = new ResetPasswordViewModel { Code = code };
-            return View(model);
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null)
-            {
-                // Don't reveal that the user does not exist
-                return RedirectToAction(nameof(ResetPasswordConfirmation));
-            }
-            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
-            if (result.Succeeded)
-            {
-                return RedirectToAction(nameof(ResetPasswordConfirmation));
-            }
-            AddErrors(result);
-            return View();
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult ResetPasswordConfirmation()
-        {
-            return View();
-        }
-
-
-        [HttpGet]
         public IActionResult AccessDenied()
         {
             return View();

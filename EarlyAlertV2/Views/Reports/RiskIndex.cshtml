@@ -1,15 +1,44 @@
 ﻿@using EarlyAlertV2.ViewModels.ReportViewModels
 @model RiskIndexReportViewModel
 
+<style>
+    .reload {
+        margin-top: .35em;
+        font-weight: 300;
+        line-height: 1em;
+        font-size: 1.7em;
+    }
+
+    .reload-icon {
+        position: relative;
+    }
+
+    .userRow {
+        cursor: pointer;
+    }
+
+</style>
+
 <div class="row">
     <div class="col-md-12">
         <div class="card">
             <div class="card-header" data-background-color="blue">
-                <h4 class="title">Students</h4>
-                <p class="category">A list of students to calculate risk index for.</p>
+                <div class="row">
+                    <div class="col-md-6 col-sm-6 col-xs-6">
+                        <div class="card-block">
+                            <h4 class="title">Students</h4>
+                            <p class="category">A list of students to calculate risk index for.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6 col-xs-6 text-right">
+                        <a asp-controller="Reports" asp-action="RiskIndex" asp-route-reportId="@Model.ReportId" asp-route-refreshData="true">
+                            <p class="reload">Reload Data: <i class="material-icons reload-icon">refresh</i></p>
+                        </a>
+                    </div>
+                </div>
             </div>
             <div class="card-content table-responsive">
-                <table class="table">
+                <table class="table table-hover">
                     <thead class="text-primary">
                         <tr>
                             <th>ID</th>
@@ -20,15 +49,49 @@
                     <tbody>
                         @foreach (var index in Model.UserRiskIndicies.OrderByDescending(x => x.Value))
                         {
-                            var user = Model.Users.First(x => x.Id == index.Key);
-                            <tr>
+                        var user = Model.Users.First(x => x.Id == index.Key);
+                        <tr class="userRow">
                             <td>@user.Id</td>
                             <td>@user.Name</td>
                             <td>
                                 <div class="progress">
-                                    <div class="progress-bar progress-bar-success" role="progressbar" style="width: @index.Value%">
-                                    </div>
+                                    @{
+                                        var riskIndex = Math.Round(index.Value, 2);
+
+                                        if (riskIndex >= 75) // Ultra High risk 75-100%
+                                        {
+                                            <div class="progress-bar progress-bar-danger" role="progressbar" style="width: @index.Value%">
+                                                @Math.Round(index.Value, 2)%
+                                            </div>
+
+                                        }
+                                        else if (riskIndex >= 50) // High risk 50-74
+                                        {
+                                            <div class="progress-bar" role="progressbar" style="background-color: #f59a2a; width: @index.Value%">
+                                                @Math.Round(index.Value, 2)%
+                                            </div>
+
+                                        }
+                                        else if (riskIndex >= 25) // Medium Risk 25-49
+                                        {
+                                            <div class="progress-bar" role="progressbar" style="background-color: #baca38; width: @index.Value%">
+                                                @Math.Round(index.Value, 2)%
+                                            </div>
+
+                                        }
+                                        else // Low risk 0-24
+                                        {
+                                            <div class="progress-bar progress-bar-success" role="progressbar" style="width: @index.Value%">
+                                                @Math.Round(index.Value, 2)%
+                                            </div>
+                                        }
+                                    }
                                 </div>
+                            </td>
+                        </tr>
+                        <tr hidden>
+                            <td colspan="3">
+                                @*Number of Active Courses: @user.StudentCourses.Count()*@
                             </td>
                         </tr>
                         }
@@ -38,3 +101,9 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    $('.userRow').click(function () {
+        $(this).next('tr').toggle();
+    });
+</script>

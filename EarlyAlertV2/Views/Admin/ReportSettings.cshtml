@@ -1,0 +1,56 @@
+﻿@model ReportSettings
+
+<form asp-controller="Admin" asp-action="ReportSettings" method="post" role="form">
+    <div class="form-horizontal">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <input asp-for="Id" hidden />
+
+        <div class="form-group">
+            <label asp-for="GradeWeight"></label>
+            <input asp-for="GradeWeight" class="form-control" />
+            <span asp-validation-for="GradeWeight" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="MissedAssignmentsWeight"></label>
+            <input asp-for="MissedAssignmentsWeight" class="form-control" />
+            <span asp-validation-for="MissedAssignmentsWeight" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="LateAssignmentsWeight"></label>
+            <input asp-for="LateAssignmentsWeight" class="form-control" />
+            <span asp-validation-for="LateAssignmentsWeight" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="ActivityWeight"></label>
+            <input asp-for="ActivityWeight" class="form-control" />
+            <span asp-validation-for="ActivityWeight" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="CommunicationWeight"></label>
+            <input asp-for="CommunicationWeight" class="form-control" />
+            <span asp-validation-for="CommunicationWeight" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ParticipationWeight"></label>
+            <input asp-for="ParticipationWeight" class="form-control" />
+            <span asp-validation-for="ParticipationWeight" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PageViewsWeight"></label>
+            <input asp-for="PageViewsWeight" class="form-control" />
+            <span asp-validation-for="PageViewsWeight" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="NumberOfActiveCoursesWeight"></label>
+            <input asp-for="NumberOfActiveCoursesWeight" class="form-control" />
+            <span asp-validation-for="NumberOfActiveCoursesWeight" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+</form>

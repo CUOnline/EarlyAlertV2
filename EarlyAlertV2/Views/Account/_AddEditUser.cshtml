@@ -1,0 +1,53 @@
+﻿@using EarlyAlertV2.ViewModels.BootstrapModels
+@model AddEditUserViewModel
+
+
+<form asp-controller="Account" asp-action="AddEditUser" method="post" role="form">
+    @await Html.PartialAsync("_ModalHeader", new ModalHeader { Heading = String.Format("{0} User", string.IsNullOrWhiteSpace(Model.UserId) ? "Add" : "Edit") })
+
+    <div class="modal-body form-horizontal">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <input asp-for="UserId" hidden />
+
+        <div class="form-group">
+            <label asp-for="FirstName"></label>
+            <input asp-for="FirstName" class="form-control" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="LastName"></label>
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <h2>Roles</h2>
+
+            <input asp-for="IsAdminRole" />
+            <label asp-for="IsAdminRole"></label>
+            <span asp-validation-for="IsAdminRole" class="text-danger"></span>
+            <br />
+            <input asp-for="IsReportManagerRole" />
+            <label asp-for="IsReportManagerRole"></label>
+            <span asp-validation-for="IsReportManagerRole" class="text-danger"></span>
+        </div>
+    </div>
+    @await Html.PartialAsync("_ModalFooter", new ModalFooter { })
+</form>
+
+<script type="text/javascript">
+    $(function () {
+        $("[id^=modal-action-").on('loaded.bs.modal', function (e) {
+            $.validator.unobtrusive.parse(this);
+        }).on('shown.bs.modal', function () {
+            $(document).off('focusin.modal');
+        }).on('hidden.bs.modal', function (e) {
+            $(this).removeData('bs.modal');
+        });
+    });
+</script>

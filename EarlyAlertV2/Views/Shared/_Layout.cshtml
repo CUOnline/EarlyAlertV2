@@ -85,6 +85,21 @@
                                 <p>Account</p>
                             </a>
                         </li>
+                        if(User.IsInRole(UserRoles.AdminRole) || User.IsInRole(UserRoles.OITAdminRole))
+                        {
+                        <li>
+                            <a asp-area="" asp-controller="Account" asp-action="UserAccounts" title="Manage">
+                                <i class="material-icons">toc</i>
+                                <p>User Accounts</p>
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-area="" asp-controller="Admin" asp-action="ReportSettings" title="Manage">
+                                <i class="material-icons">settings</i>
+                                <p>Report Settings</p>
+                            </a>
+                        </li>
+                        }
                     }
                 </ul>
             </div>
@@ -142,7 +157,7 @@
                             </li>
                         </ul>
 
-                        <form class="searchBar navbar-form navbar-right" role="search">
+                        <form class="searchBar navbar-form navbar-right" role="search" hidden>
                             <div class="form-group  is-empty">
                                 <input type="text" class="form-control" placeholder="Search">
                                 <span class="material-input"></span>

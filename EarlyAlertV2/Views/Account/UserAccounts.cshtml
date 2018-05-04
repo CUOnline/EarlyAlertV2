@@ -1,0 +1,103 @@
+﻿@using System.Linq
+@using EarlyAlertV2.Models
+@using Microsoft.AspNetCore.Identity
+@using EarlyAlertV2.ViewModels.BootstrapModels
+@inject UserManager<ApplicationUser> userManager
+@model EarlyAlertV2.ViewModels.AccountViewModels.UserAccountsViewModel
+
+@{
+    ViewData["Title"] = "User Accounts";
+}
+
+
+@*<div class="panel panel-primary">
+        <div class="panel-heading">User Search</div>
+        <div class="panel-body">
+            <form asp-action="SearchUserAccounts" method="post">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Last Name</label>
+                        <input asp-for="SearchLastName" />
+                    </div>
+                    <div class="col-md-3">
+                        <label>First Name</label>
+                        <input asp-for="SearchFirstName" />
+                    </div>
+                    <div class="col-md-6">
+                        <input type="submit" value="Search" class="btn btn-primary" />
+                        <a asp-controller="Account" asp-action="UserAccounts" class="btn btn-success">Reset</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>*@
+
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header" data-background-color="blue">
+
+                <div class="row">
+                    <div class="col-md-6 col-sm-6 col-xs-6">
+                        <div class="card-block">
+                            <h4 class="title">User Accounts</h4>
+                            <p class="category">A list of users.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="card-content table-responsive">
+                <div class="btn-group">
+                    <a id="createEditMethodModal" data-toggle="modal" asp-action="AddEditUser" data-target="#modal-action-user" class="btn btn-primary">
+                        Add
+                    </a>
+                </div>
+                @if (Model.Users != null && Model.Users.Any())
+                {
+                    <table id="usersTable" class="table table-hover">
+                        <thead class="text-primary">
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in Model.Users)
+                            {
+                                <tr>
+                                    <td>@user.FullNameReversed</td>
+                                    <td>@user.Email</td>
+                                    <td>
+                                        @((await userManager.IsInRoleAsync(user, UserRoles.AdminRole)) ? UserRoles.AdminRole.ToString() : "")
+                                        @((await userManager.IsInRoleAsync(user, UserRoles.OITAdminRole)) ? UserRoles.OITAdminRole.ToString() : "")
+                                    </td>
+                                    <td>
+                                        <a id="editUserModal" data-toggle="modal" asp-action="AddEditUser" asp-route-id="@user.Id" data-target="#modal-action-user" class="btn btn-info">
+                                            Edit
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="alert alert-info">There are currently no user accounts</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("_Modal", new BootstrapModel { ID = "modal-action-user", AreaLabeledId = "modal-action-user-label", Size = ModalSize.Large })
+@section scripts
+    {
+    <script src="~/js/bootstrap-index.js" asp-append-version="true"></script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

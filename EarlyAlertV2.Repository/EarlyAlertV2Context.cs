@@ -18,6 +18,7 @@ namespace EarlyAlertV2.Repository
         public DbSet<Report> Reports { get; set; }
         public DbSet<StudentAssignmentSubmission> StudentAssignmentSubmissions { get; set; }
         public DbSet<AssignmentGroup> AssignmentGroups { get; set; }
+        public DbSet<ReportSettings> ReportSettings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

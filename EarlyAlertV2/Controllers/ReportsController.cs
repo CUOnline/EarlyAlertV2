@@ -26,10 +26,11 @@ namespace EarlyAlertV2.Controllers
         private readonly IStudentAssignmentSubmissionBLL studentAssignmentSubmissionBll;
         private readonly IAssignmentGroupBLL assignmentGroupBll;
         private readonly IGradeBLL gradeBll;
+        private readonly IReportSettingsBLL reportSettingsBll;
 
         public ReportsController(ICanvasClient canvasClient, IReportBLL reportBll, IStudentBLL studentBll,
             ICourseBLL courseBll, IAssignmentBLL assignmentBll, IStudentAssignmentSubmissionBLL studentAssignmentSubmissionBll,
-            IAssignmentGroupBLL assignmentGroupBll, IGradeBLL gradeBll)
+            IAssignmentGroupBLL assignmentGroupBll, IGradeBLL gradeBll, IReportSettingsBLL reportSettingsBll)
         {
             this.canvasClient = canvasClient;
             this.reportBll = reportBll;
@@ -39,6 +40,7 @@ namespace EarlyAlertV2.Controllers
             this.studentAssignmentSubmissionBll = studentAssignmentSubmissionBll;
             this.assignmentGroupBll = assignmentGroupBll;
             this.gradeBll = gradeBll;
+            this.reportSettingsBll = reportSettingsBll;
         }
 
         public IActionResult Index()
@@ -76,7 +78,7 @@ namespace EarlyAlertV2.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> RiskIndex(int reportId)
+        public async Task<IActionResult> RiskIndex(int reportId, bool? refreshData)
         {
 
             var model = new RiskIndexReportViewModel()
@@ -93,7 +95,7 @@ namespace EarlyAlertV2.Controllers
                 // Get students for report
                 var students = await UpdateStudents(report.ReportData);
 
-                if (false)
+                if (refreshData.HasValue && refreshData.Value)
                 { 
                     // Determine classes students are currently taking
                     var studentCourses = await UpdateCourses(students);
@@ -148,23 +150,77 @@ namespace EarlyAlertV2.Controllers
                     }
                 }
 
-
-
                 model.Users = students.ToList();
                 
                 foreach(var user in model.Users)
                 {
-                    double totalCourseGrade = 0;
-                    foreach (var courseGrade in user.CourseGrades)
-                    {
-                        totalCourseGrade += courseGrade.Value;
-                    }
-
-                    model.UserRiskIndicies.Add(user.Id, totalCourseGrade / user.CourseGrades.Count);
+                    model.UserRiskIndicies.Add(user.Id, CalculateUserRiskIndex(user));
                 }
             }
 
             return View(model);
+        }
+
+        private double CalculateUserRiskIndex(Student user)
+        {
+            var reportSettings = reportSettingsBll.GetAll().FirstOrDefault();
+
+            var averageGradeIndex = GetOverallAverageGrade(user) * (reportSettings.GradeWeight / 100);
+            var lateAssignmentsIndex = GetAverageLateAssignments(user) * (reportSettings.LateAssignmentsWeight / 100);
+            var missingAssignmentsIndex = GetAverageMissingAssignments(user) * (reportSettings.MissedAssignmentsWeight / 100);
+
+            // For each of these.. we need to determine what is rare/moderate/frequent...
+            var numberOfActiveCoursesIndex = 100 * (reportSettings.NumberOfActiveCoursesWeight / 100);
+
+            // These are relative to other students in the courses...  We need to calculate a low/high index for 
+            // each and determine where the user fits within the scale.  Example: Low|------x---|High --> Student is at 70% participation compared to other students.
+            var pageViewsIndex = 100 * (reportSettings.PageViewsWeight / 100);
+            var participationIndex = 100 * (reportSettings.ParticipationWeight / 100);
+            var activityIndex = 100 * (reportSettings.ActivityWeight / 100);
+            var communicationIndex = 100 * (reportSettings.CommunicationWeight / 100);
+
+            return 100 - (averageGradeIndex 
+                        + lateAssignmentsIndex 
+                        + missingAssignmentsIndex
+                        + numberOfActiveCoursesIndex
+                        + pageViewsIndex
+                        + participationIndex
+                        + communicationIndex);
+        }
+
+        private double GetOverallAverageGrade(Student user)
+        {
+            double totalCourseGrade = 0;
+            foreach (var courseGrade in user.CourseGrades)
+            {
+                totalCourseGrade += courseGrade.Value;
+            }
+
+            return (totalCourseGrade / user.CourseGrades.Count);
+        }
+
+        private double GetAverageLateAssignments(Student user)
+        {
+            double totalSubmissions = user.StudentAssignmentSubmissions.Count();
+
+            if(totalSubmissions == 0)
+            {
+                return 100;
+            }
+
+            return (user.StudentAssignmentSubmissions.Where(x => !x.Late).Count() / totalSubmissions) * 100;
+        }
+
+        private double GetAverageMissingAssignments(Student user)
+        {
+            double totalSubmissions = user.StudentAssignmentSubmissions.Count();
+
+            if (totalSubmissions == 0)
+            {
+                return 100;
+            }
+
+            return (user.StudentAssignmentSubmissions.Where(x => !x.Missing).Count() / totalSubmissions) * 100;
         }
 
         private double GetStudentAverage(List<Assignment> assignments, List<StudentAssignmentSubmission> studentSubmissions, double weight)

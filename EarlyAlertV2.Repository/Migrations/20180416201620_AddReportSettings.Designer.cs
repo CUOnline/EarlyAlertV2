@@ -12,9 +12,10 @@ using System;
 namespace EarlyAlertV2.Repository.Migrations
 {
     [DbContext(typeof(EarlyAlertV2Context))]
-    partial class EarlyAlertV2ContextModelSnapshot : ModelSnapshot
+    [Migration("20180416201620_AddReportSettings")]
+    partial class AddReportSettings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

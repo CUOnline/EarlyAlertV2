@@ -11,6 +11,10 @@
         position: relative;
         top: .18em;
     }
+
+    tr {
+        cursor: pointer;
+    }
 </style>
 
 <div class="row">
@@ -18,18 +22,8 @@
         <div class="card">
             <div class="card-header" data-background-color="blue">
 
-                <div class="row">
-                    <div class="col-md-6 col-sm-6 col-xs-6">
-                        <div class="card-block">
-                            <h4 class="title">Reports</h4>
-                            <p class="category">A list of reports that have been generated.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-sm-6 col-xs-6 text-right">
-                        <p class="reload">Reload Data: <i class="material-icons reload-icon">refresh</i></p>
-                        
-                    </div>
-                </div>
+                <h4 class="title">Reports</h4>
+                <p class="category">A list of reports that have been generated.</p>
 
             </div>
             <div class="card-content table-responsive">
@@ -59,7 +53,6 @@
                             <td>Test Report</td>
                             <th>2/3/2018</th>
                             <th>2/22/2018</th>
-                            @*<td class="text-primary"><a asp-area="" asp-controller="Reports" asp-action="RiskIndex">View Report</a></td>*@
                         </tr>
                     </tbody>
                 </table>

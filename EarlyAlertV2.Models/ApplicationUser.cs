@@ -16,7 +16,5 @@ namespace EarlyAlertV2.Models
 
         [NotMapped]
         public string FullNameReversed => $"{LastName}, {FirstName}";
-
-        //public virtual ICollection<ApplicationUserProgram> ApplicationUserPrograms { get; set; }
     }
 }
