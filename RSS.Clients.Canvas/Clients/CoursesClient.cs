@@ -66,19 +66,6 @@ namespace RSS.Clients.Canvas.Clients
     }
 }
 
-// Current Grade of student
-// - Get Courses student is signed up for
-//      - Get all assignments for course.
-//          - Determine which assignments should be turned in already (for Late/Missing Assignments)
-//      - Get assignments submitted by user
-//          - Get graded assignments
-//          - Get ungraded assignments
-
-
-// Missing Assignments
-// Late Assignments
-
-
 // Activity
 // Communication
 // Participation

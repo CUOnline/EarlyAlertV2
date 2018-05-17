@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Runtime.Serialization;
 using System.Security;
@@ -120,8 +119,7 @@ namespace RSS.Clients.Canvas.Exceptions
             string responseBody = response != null ? response.Body as string : null;
             return GetApiErrorFromExceptionMessage(responseBody);
         }
-
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
+        
         static ApiError GetApiErrorFromExceptionMessage(string responseContent)
         {
             try
@@ -137,8 +135,7 @@ namespace RSS.Clients.Canvas.Exceptions
 
             return new ApiError(responseContent);
         }
-
-#if !NO_SERIALIZABLE
+        
         /// <summary>
         /// Constructs an instance of ApiException.
         /// </summary>
@@ -165,7 +162,6 @@ namespace RSS.Clients.Canvas.Exceptions
             info.AddValue("HttpStatusCode", StatusCode);
             info.AddValue("ApiError", ApiError);
         }
-#endif
 
         /// <summary>
         /// Get the inner error message from the API response

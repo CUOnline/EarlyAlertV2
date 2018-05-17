@@ -583,8 +583,7 @@ namespace RSS.Clients.Canvas.Http
                 { HttpStatusCode.Unauthorized, response => new AuthorizationException(response) },
                 { HttpStatusCode.Forbidden, GetExceptionForForbidden },
                 { HttpStatusCode.NotFound, response => new NotFoundException(response) },
-                { (HttpStatusCode)422, response => new ApiValidationException(response) },
-                { (HttpStatusCode)451, response => new LegalRestrictionException(response) }
+                { (HttpStatusCode)422, response => new ApiValidationException(response) }
             };
 
         static void HandleErrors(IResponse response)

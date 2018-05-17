@@ -59,19 +59,12 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
-#if !NO_SERIALIZABLE
 using System.Runtime.Serialization;
-#endif
 using System.Text;
-#if !SIMPLE_JSON_NO_LINQ_EXPRESSION
 using System.Linq.Expressions;
 using RSS.Clients.Canvas;
 using RSS.Clients.Canvas.Reflection;
 using RSS.Clients.Canvas.Helpers;
-#endif
-#if SIMPLE_JSON_DYNAMIC
-using System.Dynamic;
-#endif
 
 // ReSharper disable LoopCanBeConvertedToQuery
 // ReSharper disable RedundantExplicitArrayCreation
@@ -84,12 +77,8 @@ namespace RSS.Clients.Canvas
     [GeneratedCode("simple-json", "1.0.0")]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
-#if SIMPLE_JSON_OBJARRAYINTERNAL
-    internal
-#else
-    public
-#endif
- class JsonArray : List<object>
+
+    public class JsonArray : List<object>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonArray"/> class.
@@ -403,12 +392,8 @@ namespace RSS.Clients.Canvas
             object obj;
             if (TryDeserializeObject(json, out obj))
                 return obj;
-
-#if !NO_SERIALIZABLE
+            
             throw new SerializationException("Invalid JSON string");
-#else
-            throw new Exception("Invalid JSON string");
-#endif
         }
 
         /// <summary>

@@ -41,8 +41,7 @@ namespace RSS.Clients.Canvas.Exceptions
             Debug.Assert(response != null && response.StatusCode == HttpStatusCode.NotFound,
                 "NotFoundException created with wrong status code");
         }
-
-#if !NO_SERIALIZABLE
+        
         /// <summary>
         /// Constructs an instance of NotFoundException
         /// </summary>
@@ -58,6 +57,5 @@ namespace RSS.Clients.Canvas.Exceptions
             : base(info, context)
         {
         }
-#endif
     }
 }
