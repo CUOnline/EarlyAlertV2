@@ -93,64 +93,24 @@ namespace EarlyAlertV2.Controllers
                 var report = reportBll.Get(reportId);
 
                 // Get students for report
-                var students = await UpdateStudents(report.ReportData);
+                model.Users = await UpdateStudents(report.ReportData);
 
                 if (refreshData.HasValue && refreshData.Value)
                 { 
                     // Determine classes students are currently taking
-                    var studentCourses = await UpdateCourses(students);
+                    var studentCourses = await UpdateCourses(model.Users);
 
                     // Get all the assignments for courses
                     await UpdateAssignmentsForCourses(studentCourses);
 
                     // Get student submissions for assignments
-                    var studentSubmissions = await UpdateStudentSubmissions(students, studentCourses);
+                    await UpdateStudentSubmissions(model.Users, studentCourses);
+
+                    // Update student grades
+                    UpdateGrades(model.Users);
+
+                    await UpdateStudentActivity(model.Users);
                 }
-
-                // OK .... Now... I finally have all the data.  Start calculating scores for students.
-                foreach (var student in students)
-                {
-                    var currentStudent = studentBll.Get(student.Id);
-                    var activeCourses = currentStudent.StudentCourses.Select(x => x.Course);
-
-                    foreach(var course in activeCourses)
-                    {
-                        var studentCourseSubmissions = studentAssignmentSubmissionBll.GetAll().Where(x => x.StudentId == currentStudent.Id);
-                        var assignmentGroups = assignmentGroupBll.GetAllByCourseId(course.Id);
-
-                        // If calculation is using course weights
-                        double average = 0;
-                        if (assignmentGroups.Select(x => x.GroupWeight).Any(weight => weight > 0))
-                        {
-                            foreach(var assignmentGroup in assignmentGroups)
-                            {
-                                average += GetStudentAverage(assignmentGroup.Assignments.ToList(), studentCourseSubmissions.ToList(), assignmentGroup.GroupWeight);
-                            }
-                        }
-                        else // calculate using all due assignments in course.  All assignments count toward 100% of the course.
-                        {
-                            average = GetStudentAverage(assignmentGroups.SelectMany(x => x.Assignments).ToList(), studentCourseSubmissions.ToList(), 100);
-                        }
-
-                        var grade = gradeBll.GetByCourseAndStudent(course.Id, student.Id);
-                        if(grade == null)
-                        {
-                            gradeBll.Add(new Grade()
-                            {
-                                CourseId = course.Id,
-                                StudentId = student.Id,
-                                Value = average
-                            });
-                        }
-                        else
-                        {
-                            grade.Value = average;
-                            gradeBll.Update(grade);
-                        }
-                    }
-                }
-
-                model.Users = students.ToList();
                 
                 foreach(var user in model.Users)
                 {
@@ -161,6 +121,67 @@ namespace EarlyAlertV2.Controllers
             return View(model);
         }
 
+        private async Task UpdateStudentActivity(List<Student> users)
+        {
+            foreach(var user in users)
+            {
+                var latestPageView = await canvasClient.UsersClient.GetLatestPageView(user.SISUserId);
+                user.LatestActivity = latestPageView.FirstOrDefault()?.CreatedAt;
+                studentBll.Update(user);
+            }
+        }
+
+        private void UpdateGrades(List<Student> students)
+        { 
+            // Start calculating scores for students.
+            foreach (var student in students)
+            {
+                var currentStudent = studentBll.Get(student.Id);
+
+                // Clean out old grades
+                currentStudent.CourseGrades = new List<Grade>();
+                currentStudent = studentBll.Update(student);
+
+                var activeCourses = currentStudent.StudentCourses.Select(x => x.Course);
+
+                foreach (var course in activeCourses)
+                {
+                    var studentCourseSubmissions = studentAssignmentSubmissionBll.GetAll().Where(x => x.StudentId == currentStudent.Id);
+                    var assignmentGroups = assignmentGroupBll.GetAllByCourseId(course.Id);
+
+                    // If calculation is using course weights
+                    double average = 0;
+                    if (assignmentGroups.Select(x => x.GroupWeight).Any(weight => weight > 0))
+                    {
+                        foreach (var assignmentGroup in assignmentGroups)
+                        {
+                            average += GetStudentAverage(assignmentGroup.Assignments.ToList(), studentCourseSubmissions.ToList(), assignmentGroup.GroupWeight);
+                        }
+                    }
+                    else // calculate using all due assignments in course.  All assignments count toward 100% of the course.
+                    {
+                        average = GetStudentAverage(assignmentGroups.SelectMany(x => x.Assignments).ToList(), studentCourseSubmissions.ToList(), 100);
+                    }
+
+                    var grade = gradeBll.GetByCourseAndStudent(course.Id, student.Id);
+                    if (grade == null)
+                    {
+                        gradeBll.Add(new Grade()
+                        {
+                            CourseId = course.Id,
+                            StudentId = student.Id,
+                            Value = average
+                        });
+                    }
+                    else
+                    {
+                        grade.Value = average;
+                        gradeBll.Update(grade);
+                    }
+                }
+            }
+        }
+
         private double CalculateUserRiskIndex(Student user)
         {
             var reportSettings = reportSettingsBll.GetAll().FirstOrDefault();
@@ -168,29 +189,23 @@ namespace EarlyAlertV2.Controllers
             var averageGradeIndex = GetOverallAverageGrade(user) * (reportSettings.GradeWeight / 100);
             var lateAssignmentsIndex = GetAverageLateAssignments(user) * (reportSettings.LateAssignmentsWeight / 100);
             var missingAssignmentsIndex = GetAverageMissingAssignments(user) * (reportSettings.MissedAssignmentsWeight / 100);
-
-            // For each of these.. we need to determine what is rare/moderate/frequent...
-            var numberOfActiveCoursesIndex = 100 * (reportSettings.NumberOfActiveCoursesWeight / 100);
-
-            // These are relative to other students in the courses...  We need to calculate a low/high index for 
-            // each and determine where the user fits within the scale.  Example: Low|------x---|High --> Student is at 70% participation compared to other students.
-            var pageViewsIndex = 100 * (reportSettings.PageViewsWeight / 100);
-            var participationIndex = 100 * (reportSettings.ParticipationWeight / 100);
-            var activityIndex = 100 * (reportSettings.ActivityWeight / 100);
-            var communicationIndex = 100 * (reportSettings.CommunicationWeight / 100);
+            var activityIndex = GetActivityPercentage(user, reportSettings.ActivityTimeMin, reportSettings.ActivityTimeMax) * (reportSettings.ActivityWeight / 100);
 
             return 100 - (averageGradeIndex 
                         + lateAssignmentsIndex 
                         + missingAssignmentsIndex
-                        + numberOfActiveCoursesIndex
-                        + pageViewsIndex
-                        + participationIndex
-                        + communicationIndex);
+                        + activityIndex);
         }
 
         private double GetOverallAverageGrade(Student user)
         {
+            if (!user.CourseGrades.Any())
+            {
+                return 100;
+            }
+
             double totalCourseGrade = 0;
+            
             foreach (var courseGrade in user.CourseGrades)
             {
                 totalCourseGrade += courseGrade.Value;
@@ -223,6 +238,30 @@ namespace EarlyAlertV2.Controllers
             return (user.StudentAssignmentSubmissions.Where(x => !x.Missing).Count() / totalSubmissions) * 100;
         }
 
+        private double GetActivityPercentage(Student user, int activityTimeMin, int activityTimeMax)
+        {
+            if (user.LatestActivity.HasValue)
+            {
+                var daysSinceActivity = user.LastUpdated.Value.Day - user.LatestActivity.Value.Day;
+
+                if(daysSinceActivity <= activityTimeMin)
+                {
+                    return 100;
+                }
+                else if(daysSinceActivity >= activityTimeMax)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return ((daysSinceActivity - activityTimeMax) / (activityTimeMin - activityTimeMax)) * 100;
+                }
+            }
+
+            // Student has no activity
+            return 0;
+        }
+
         private double GetStudentAverage(List<Assignment> assignments, List<StudentAssignmentSubmission> studentSubmissions, double weight)
         {
             double totalStudentGrade = 0;
@@ -230,7 +269,10 @@ namespace EarlyAlertV2.Controllers
             foreach(var assignment in assignments)
             {
                 var studentAssignmentSubmission = studentSubmissions.FirstOrDefault(x => x.AssignmentId == assignment.Id);
-                if(studentAssignmentSubmission != null && studentAssignmentSubmission.Score != null && studentAssignmentSubmission.WorkflowState == "graded")
+                if (studentAssignmentSubmission != null 
+                    && studentAssignmentSubmission.Score != null 
+                    && studentAssignmentSubmission.WorkflowState == "graded" 
+                    && studentAssignmentSubmission.Assignment.PointsPossible != null)
                 {
                     totalStudentGrade += studentAssignmentSubmission.Score.Value;
                     maxPossibleGrade += studentAssignmentSubmission.Assignment.PointsPossible.Value;
@@ -294,6 +336,10 @@ namespace EarlyAlertV2.Controllers
 
             foreach (var student in students)
             {
+                // clean up student's active courses
+                student.StudentCourses = new List<StudentCourse>();
+                studentBll.Update(student);
+
                 // Get active courses for student
                 var studentActiveCourses = await canvasClient.UsersClient.Courses.GetAll(student.CanvasId, includeTotalScores: false, activeCourses: true);
 
@@ -358,6 +404,11 @@ namespace EarlyAlertV2.Controllers
                             Assignments = new List<Assignment>()
                         });
                     }
+                    else
+                    {
+                        assignmentGroup.Assignments = new List<Assignment>();
+                        assignmentGroup = assignmentGroupBll.Update(assignmentGroup);
+                    }
 
                     // Add assignments
                     foreach(var groupAssignment in group.Assignments)
@@ -381,6 +432,14 @@ namespace EarlyAlertV2.Controllers
                                 PointsPossible = groupAssignment.PointsPossible
                             });
                         }
+                        else
+                        {
+                            assignment.DueAt = groupAssignment.DueAt;
+                            assignment.LockAt = groupAssignment.LockAt;
+                            assignment.UnlockAt = groupAssignment.UnlocksAt;
+                            assignment.PointsPossible = groupAssignment.PointsPossible;
+                            assignment = assignmentBll.Update(assignment);
+                        }
                     }
                 }
             }
@@ -392,6 +451,8 @@ namespace EarlyAlertV2.Controllers
             foreach (var student in students)
             {
                 var currentStudent = studentBll.Get(student.Id);
+                currentStudent.StudentAssignmentSubmissions = new List<StudentAssignmentSubmission>();
+                studentBll.Update(currentStudent);
 
                 foreach(var studentCourse in student.StudentCourses)
                 {
@@ -416,7 +477,7 @@ namespace EarlyAlertV2.Controllers
                             if (studentSubmission == null)
                             {
                                 var assignment = assignmentBll.GetByCanvasId(submission.AssignmentId);
-
+                                
                                 studentSubmission = studentAssignmentSubmissionBll.Add(new StudentAssignmentSubmission()
                                 {
                                     StudentId = student.Id,
@@ -449,6 +510,19 @@ namespace EarlyAlertV2.Controllers
             }
 
             return studentAssignmentSubmissions;
+        }
+
+        public IActionResult StudentProfile(int id)
+        {
+            var student = studentBll.Get(id);
+
+            var model = new StudentProfileViewModel()
+            {
+                StudentId = id,
+                Student = student
+            };
+            
+            return View(model);
         }
     }
 }

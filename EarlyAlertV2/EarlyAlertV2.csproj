@@ -28,4 +28,8 @@
     <ProjectReference Include="..\RSS.Providers.Canvas\RSS.Providers.Canvas.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\content\" />
+  </ItemGroup>
+
 </Project>

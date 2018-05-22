@@ -12,6 +12,8 @@ namespace RSS.Clients.Canvas.Interfaces.Client
 
         Task<UserResult> Get(string sisUserId);
 
+        Task<List<PageViewsResult>> GetLatestPageView(string sisUserId);
+
         ICoursesClient Courses { get; }
     }
 }

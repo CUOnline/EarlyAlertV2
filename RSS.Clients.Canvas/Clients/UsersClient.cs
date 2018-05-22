@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace RSS.Clients.Canvas.Clients
 {
@@ -31,6 +32,13 @@ namespace RSS.Clients.Canvas.Clients
             Ensure.ArgumentNotNull(sisUserId, "sisUserId");
 
             return ApiConnection.Get<UserResult>(ApiUrls.User(sisUserId));
+        }
+
+        public Task<List<PageViewsResult>> GetLatestPageView(string sisUserId)
+        {
+            Ensure.ArgumentNotNull(sisUserId, "sisUserId");
+
+            return ApiConnection.Get<List<PageViewsResult>>(ApiUrls.UserLatestPageView(sisUserId));
         }
     }
 }

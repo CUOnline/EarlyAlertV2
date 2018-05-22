@@ -27,14 +27,18 @@
                     <div class="col-md-6 col-sm-6 col-xs-6">
                         <div class="card-block">
                             <h4 class="title">Students</h4>
-                            <p class="category">A list of students to calculate risk index for.</p>
+                            <p class="category">Select a student to see his/her student profile.</p>
                         </div>
                     </div>
+                    @if (User.IsInRole(UserRoles.AdminRole) || User.IsInRole(UserRoles.OITAdminRole))
+                    {
                     <div class="col-md-6 col-sm-6 col-xs-6 text-right">
+
                         <a asp-controller="Reports" asp-action="RiskIndex" asp-route-reportId="@Model.ReportId" asp-route-refreshData="true">
                             <p class="reload">Reload Data: <i class="material-icons reload-icon">refresh</i></p>
                         </a>
                     </div>
+                    }
                 </div>
             </div>
             <div class="card-content table-responsive">
@@ -89,11 +93,6 @@
                                 </div>
                             </td>
                         </tr>
-                        <tr hidden>
-                            <td colspan="3">
-                                @*Number of Active Courses: @user.StudentCourses.Count()*@
-                            </td>
-                        </tr>
                         }
                     </tbody>
                 </table>
@@ -104,6 +103,7 @@
 
 <script type="text/javascript">
     $('.userRow').click(function () {
-        $(this).next('tr').toggle();
+        var id = $(this).children('td:first').text();
+        location.href = "/Reports/StudentProfile/" + id;
     });
 </script>

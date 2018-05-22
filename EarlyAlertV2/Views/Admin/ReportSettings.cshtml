@@ -6,22 +6,30 @@
         <input asp-for="Id" hidden />
 
         <div class="row">
-            <div class="form-group">
-                <label asp-for="GradeWeight"></label>
-                <input asp-for="GradeWeight" class="form-control" />
-                <span asp-validation-for="GradeWeight" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MissedAssignmentsWeight"></label>
-                <input asp-for="MissedAssignmentsWeight" class="form-control" />
-                <span asp-validation-for="MissedAssignmentsWeight" class="text-danger"></span>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="GradeWeight"></label>
+                    <input asp-for="GradeWeight" class="form-control" />
+                    <span asp-validation-for="GradeWeight" class="text-danger"></span>
+                </div>
             </div>
         </div>
         <div class="row">
-            <div class="form-group">
-                <label asp-for="LateAssignmentsWeight"></label>
-                <input asp-for="LateAssignmentsWeight" class="form-control" />
-                <span asp-validation-for="LateAssignmentsWeight" class="text-danger"></span>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="MissedAssignmentsWeight"></label>
+                    <input asp-for="MissedAssignmentsWeight" class="form-control" />
+                    <span asp-validation-for="MissedAssignmentsWeight" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="LateAssignmentsWeight"></label>
+                    <input asp-for="LateAssignmentsWeight" class="form-control" />
+                    <span asp-validation-for="LateAssignmentsWeight" class="text-danger"></span>
+                </div>
             </div>
         </div>
         
@@ -33,13 +41,21 @@
                     <span asp-validation-for="ActivityWeight" class="text-danger"></span>
                 </div>
 
-                <div class="form-group">
-                    <label>Time Range</label>
-                    <input type="number" placeholder="Min" class="form-control" />
-                    <input type="number" placeholder="Max" class="form-control" />
-                </div>
+
             </div>
             <div class="col-md-6">
+                <div class="form-group">
+                    <div class="col-md-3">
+                        <label class="form-info">Time Range (Days)</label>
+                        <input asp-for="ActivityTimeMin" placeholder="Min" class="form-control" />
+                        <span asp-validation-for="ActivityTimeMin" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-info"></label>
+                        <input asp-for="ActivityTimeMax" placeholder="Max" class="form-control" />
+                        <span asp-validation-for="ActivityTimeMax" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
         </div>
 

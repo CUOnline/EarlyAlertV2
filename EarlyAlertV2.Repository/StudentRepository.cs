@@ -30,12 +30,21 @@ namespace EarlyAlertV2.Repository
                     .ThenInclude(x => x.Course)
                         .ThenInclude(x => x.Assignments)
                 .Include(x => x.StudentAssignmentSubmissions)
+                .Include(x => x.CourseGrades)
+                    .ThenInclude(x => x.Course)
                 .FirstOrDefault(x => x.Id == modelId);
         }
 
         public Student GetBySisId(string sisId)
         {
-            return Context.Students.FirstOrDefault(x => x.SISUserId == sisId);
+            return Context.Students
+                .Include(x => x.StudentCourses)
+                    .ThenInclude(x => x.Course)
+                        .ThenInclude(x => x.Assignments)
+                .Include(x => x.StudentAssignmentSubmissions)
+                .Include(x => x.CourseGrades)
+                    .ThenInclude(x => x.Course)
+                .FirstOrDefault(x => x.SISUserId == sisId);
         }
 
         public Student GetByCanvasId(int canvasId)

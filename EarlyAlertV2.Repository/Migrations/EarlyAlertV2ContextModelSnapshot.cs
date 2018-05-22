@@ -213,6 +213,10 @@ namespace EarlyAlertV2.Repository.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int>("ActivityTimeMax");
+
+                    b.Property<int>("ActivityTimeMin");
+
                     b.Property<double>("ActivityWeight");
 
                     b.Property<double>("CommunicationWeight");
@@ -248,6 +252,8 @@ namespace EarlyAlertV2.Repository.Migrations
                     b.Property<DateTime>("DateCreated");
 
                     b.Property<DateTime?>("LastUpdated");
+
+                    b.Property<DateTime?>("LatestActivity");
 
                     b.Property<string>("Name");
 

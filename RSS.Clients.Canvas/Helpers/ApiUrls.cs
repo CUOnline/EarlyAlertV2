@@ -41,6 +41,11 @@ namespace RSS.Clients.Canvas.Helpers
             return "users/sis_user_id:{0}".FormatUri(sisUserId);
         }
         
+        public static Uri UserLatestPageView(string sisUserId)
+        {
+            return "users/sis_user_id:{0}/page_views?per_page=1".FormatUri(sisUserId);
+        }
+
         public static Uri Assignment(int assignmentId)
         {
             return "assignments/{0}".FormatUri(assignmentId);
@@ -55,8 +60,6 @@ namespace RSS.Clients.Canvas.Helpers
         {
             return "courses/{0}/assignment_groups".FormatUri(courseId);
         }
-
-
 
         /// <summary>
         /// Returns the <see cref="Uri"/> that returns all public repositories in

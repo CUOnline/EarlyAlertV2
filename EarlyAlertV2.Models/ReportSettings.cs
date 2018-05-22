@@ -29,5 +29,9 @@ namespace EarlyAlertV2.Models
 
         [Display(Name = "Number of Active Courses")]
         public double NumberOfActiveCoursesWeight { get; set; }
+
+        public int ActivityTimeMin { get; set; }
+
+        public int ActivityTimeMax { get; set; }
     }
 }

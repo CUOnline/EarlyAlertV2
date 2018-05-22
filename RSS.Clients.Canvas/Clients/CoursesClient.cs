@@ -65,9 +65,3 @@ namespace RSS.Clients.Canvas.Clients
         }
     }
 }
-
-// Activity
-// Communication
-// Participation
-// Page Views
-// Possibly - How many courses is the student currently taking?
