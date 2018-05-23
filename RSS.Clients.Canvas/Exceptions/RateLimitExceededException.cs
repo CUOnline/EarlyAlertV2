@@ -6,14 +6,13 @@ using System;
 namespace RSS.Clients.Canvas.Exceptions
 {
     /// <summary>
-    /// Exception thrown when GitHub API Rate limits are exceeded.
+    /// Exception thrown when Rate limits are exceeded.
     /// </summary>
     /// <summary>
     /// <para>
     /// For requests using Basic Authentication or OAuth, you can make up to 5,000 requests per hour. For
     /// unauthenticated requests, the rate limit allows you to make up to 60 requests per hour.
     /// </para>
-    /// <para>See http://developer.github.com/v3/#rate-limiting for more details.</para>
     /// </summary>
     public class RateLimitExceededException : ForbiddenException
     {
@@ -34,8 +33,6 @@ namespace RSS.Clients.Canvas.Exceptions
         /// <param name="innerException">The inner exception</param>
         public RateLimitExceededException(IResponse response, Exception innerException) : base(response, innerException)
         {
-            Ensure.ArgumentNotNull(response, "response");
-
             _rateLimit = response.ApiInfo.RateLimit;
         }
 

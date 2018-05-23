@@ -36,9 +36,6 @@ namespace RSS.Clients.Canvas.Http
         /// <param name="pagination">A paginator for paging API responses</param>
         protected ApiConnection(IConnection connection, IApiPagination pagination)
         {
-            Ensure.ArgumentNotNull(connection, "connection");
-            Ensure.ArgumentNotNull(pagination, "pagination");
-
             Connection = connection;
             _pagination = pagination;
         }
@@ -57,8 +54,6 @@ namespace RSS.Clients.Canvas.Http
         /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
         public Task<T> Get<T>(Uri uri)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-
             return Get<T>(uri, null);
         }
 
@@ -72,8 +67,6 @@ namespace RSS.Clients.Canvas.Http
         /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
         public async Task<T> Get<T>(Uri uri, IDictionary<string, string> parameters)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-
             var response = await Connection.Get<T>(uri, parameters, null).ConfigureAwait(false);
             return response.Body;
         }
@@ -89,9 +82,6 @@ namespace RSS.Clients.Canvas.Http
         /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
         public async Task<T> Get<T>(Uri uri, IDictionary<string, string> parameters, string accepts)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-            Ensure.ArgumentNotNull(accepts, "accepts");
-
             var response = await Connection.Get<T>(uri, parameters, accepts).ConfigureAwait(false);
             return response.Body;
         }
@@ -105,8 +95,6 @@ namespace RSS.Clients.Canvas.Http
         /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
         public async Task<string> GetHtml(Uri uri, IDictionary<string, string> parameters)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-
             var response = await Connection.GetHtml(uri, parameters).ConfigureAwait(false);
             return response.Body;
         }
@@ -187,18 +175,12 @@ namespace RSS.Clients.Canvas.Http
         /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
         public Task<IReadOnlyList<T>> GetAll<T>(Uri uri, IDictionary<string, string> parameters, string accepts)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-
             return _pagination.GetAllPages(async () => await GetPage<T>(uri, parameters, accepts).ConfigureAwait(false), uri);
         }
 
         public Task<IReadOnlyList<T>> GetAll<T>(Uri uri, IDictionary<string, string> parameters, string accepts, ApiOptions options)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-            Ensure.ArgumentNotNull(options, "options");
-
             parameters = Pagination.Setup(parameters, options);
-
             return _pagination.GetAllPages(async () => await GetPage<T>(uri, parameters, accepts, options).ConfigureAwait(false), uri);
         }
 
@@ -210,8 +192,6 @@ namespace RSS.Clients.Canvas.Http
         /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
         public Task Post(Uri uri)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-
             return Connection.Post(uri);
         }
 
@@ -224,8 +204,6 @@ namespace RSS.Clients.Canvas.Http
         /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
         public async Task<T> Post<T>(Uri uri)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-
             var response = await Connection.Post<T>(uri).ConfigureAwait(false);
             return response.Body;
         }
@@ -240,9 +218,6 @@ namespace RSS.Clients.Canvas.Http
         /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
         public Task<T> Post<T>(Uri uri, object data)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-            Ensure.ArgumentNotNull(data, "data");
-
             return Post<T>(uri, data, null, null);
         }
 
@@ -272,40 +247,12 @@ namespace RSS.Clients.Canvas.Http
         /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
         public async Task<T> Post<T>(Uri uri, object data, string accepts, string contentType)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-            Ensure.ArgumentNotNull(data, "data");
-
             var response = await Connection.Post<T>(uri, data, accepts, contentType).ConfigureAwait(false);
             return response.Body;
         }
 
-        /// <summary>
-        /// Creates a new API resource in the list at the specified URI.
-        /// </summary>
-        /// <typeparam name="T">The API resource's type.</typeparam>
-        /// <param name="uri">URI of the API resource to get</param>
-        /// <param name="data">Object that describes the new API resource; this will be serialized and used as the request's body</param>
-        /// <param name="accepts">Accept header to use for the API request</param>
-        /// <param name="contentType">Content type of the API request</param>
-        /// <param name="twoFactorAuthenticationCode">Two Factor Authentication Code</param>
-        /// <returns>The created API resource.</returns>
-        /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
-        public async Task<T> Post<T>(Uri uri, object data, string accepts, string contentType, string twoFactorAuthenticationCode)
-        {
-            Ensure.ArgumentNotNull(uri, "uri");
-            Ensure.ArgumentNotNull(data, "data");
-            Ensure.ArgumentNotNull(twoFactorAuthenticationCode, "twoFactorAuthenticationCode");
-
-            var response = await Connection.Post<T>(uri, data, accepts, contentType, twoFactorAuthenticationCode).ConfigureAwait(false);
-            return response.Body;
-        }
-
-
         public async Task<T> Post<T>(Uri uri, object data, string accepts, string contentType, TimeSpan timeout)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-            Ensure.ArgumentNotNull(data, "data");
-
             var response = await Connection.Post<T>(uri, data, accepts, contentType, timeout).ConfigureAwait(false);
             return response.Body;
         }
@@ -317,8 +264,6 @@ namespace RSS.Clients.Canvas.Http
         /// <returns>A <see cref="Task"/> for the request's execution.</returns>
         public Task Put(Uri uri)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-
             return Connection.Put(uri);
         }
 
@@ -332,51 +277,7 @@ namespace RSS.Clients.Canvas.Http
         /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
         public async Task<T> Put<T>(Uri uri, object data)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-            Ensure.ArgumentNotNull(data, "data");
-
             var response = await Connection.Put<T>(uri, data).ConfigureAwait(false);
-
-            return response.Body;
-        }
-
-        /// <summary>
-        /// Creates or replaces the API resource at the specified URI.
-        /// </summary>
-        /// <typeparam name="T">The API resource's type.</typeparam>
-        /// <param name="uri">URI of the API resource to create or replace</param>
-        /// <param name="data">Object that describes the API resource; this will be serialized and used as the request's body</param>
-        /// <param name="twoFactorAuthenticationCode">The two-factor authentication code in response to the current user's previous challenge</param>
-        /// <returns>The created API resource.</returns>
-        /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
-        public async Task<T> Put<T>(Uri uri, object data, string twoFactorAuthenticationCode)
-        {
-            Ensure.ArgumentNotNull(uri, "uri");
-            Ensure.ArgumentNotNull(data, "data");
-            Ensure.ArgumentNotNullOrEmptyString(twoFactorAuthenticationCode, "twoFactorAuthenticationCode");
-
-            var response = await Connection.Put<T>(uri, data, twoFactorAuthenticationCode).ConfigureAwait(false);
-
-            return response.Body;
-        }
-
-        /// <summary>
-        /// Creates or replaces the API resource at the specified URI.
-        /// </summary>
-        /// <typeparam name="T">The API resource's type.</typeparam>
-        /// <param name="uri">URI of the API resource to create or replace</param>
-        /// <param name="data">Object that describes the API resource; this will be serialized and used as the request's body</param>
-        /// <param name="twoFactorAuthenticationCode">The two-factor authentication code in response to the current user's previous challenge</param>
-        /// <param name="accepts">Accept header to use for the API request</param>
-        /// <returns>The created API resource.</returns>
-        /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
-        public async Task<T> Put<T>(Uri uri, object data, string twoFactorAuthenticationCode, string accepts)
-        {
-            Ensure.ArgumentNotNull(uri, "uri");
-            Ensure.ArgumentNotNull(data, "data");
-
-            var response = await Connection.Put<T>(uri, data, twoFactorAuthenticationCode, accepts).ConfigureAwait(false);
-
             return response.Body;
         }
 
@@ -387,8 +288,6 @@ namespace RSS.Clients.Canvas.Http
         /// <returns>A <see cref="Task"/> for the request's execution.</returns>
         public Task Patch(Uri uri)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-
             return Connection.Patch(uri);
         }
 
@@ -400,9 +299,6 @@ namespace RSS.Clients.Canvas.Http
         /// <returns>A <see cref="Task"/> for the request's execution.</returns>
         public Task Patch(Uri uri, string accepts)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-            Ensure.ArgumentNotNull(accepts, "accepts");
-
             return Connection.Patch(uri, accepts);
         }
 
@@ -416,11 +312,7 @@ namespace RSS.Clients.Canvas.Http
         /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
         public async Task<T> Patch<T>(Uri uri, object data)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-            Ensure.ArgumentNotNull(data, "data");
-
             var response = await Connection.Patch<T>(uri, data).ConfigureAwait(false);
-
             return response.Body;
         }
 
@@ -435,12 +327,7 @@ namespace RSS.Clients.Canvas.Http
         /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
         public async Task<T> Patch<T>(Uri uri, object data, string accepts)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-            Ensure.ArgumentNotNull(data, "data");
-            Ensure.ArgumentNotNull(accepts, "accepts");
-
             var response = await Connection.Patch<T>(uri, data, accepts).ConfigureAwait(false);
-
             return response.Body;
         }
 
@@ -451,8 +338,6 @@ namespace RSS.Clients.Canvas.Http
         /// <returns>A <see cref="Task"/> for the request's execution.</returns>
         public Task Delete(Uri uri)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-
             return Connection.Delete(uri);
         }
 
@@ -464,8 +349,6 @@ namespace RSS.Clients.Canvas.Http
         /// <returns>A <see cref="Task"/> for the request's execution.</returns>
         public Task Delete(Uri uri, string twoFactorAuthenticationCode)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-
             return Connection.Delete(uri, twoFactorAuthenticationCode);
         }
 
@@ -477,9 +360,6 @@ namespace RSS.Clients.Canvas.Http
         /// <returns>A <see cref="Task"/> for the request's execution.</returns>
         public Task Delete(Uri uri, object data)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-            Ensure.ArgumentNotNull(data, "data");
-
             return Connection.Delete(uri, data);
         }
 
@@ -492,10 +372,6 @@ namespace RSS.Clients.Canvas.Http
         /// <returns>The returned <seealso cref="HttpStatusCode"/></returns>
         public Task Delete(Uri uri, object data, string accepts)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-            Ensure.ArgumentNotNull(data, "data");
-            Ensure.ArgumentNotNull(accepts, "accepts");
-
             return Connection.Delete(uri, data, accepts);
         }
 
@@ -507,11 +383,7 @@ namespace RSS.Clients.Canvas.Http
         /// <param name="data">The object to serialize as the body of the request</param>
         public async Task<T> Delete<T>(Uri uri, object data)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-            Ensure.ArgumentNotNull(data, "data");
-
             var response = await Connection.Delete<T>(uri, data).ConfigureAwait(false);
-
             return response.Body;
         }
 
@@ -525,12 +397,7 @@ namespace RSS.Clients.Canvas.Http
         /// <param name="accepts">Specifies accept response media type</param>
         public async Task<T> Delete<T>(Uri uri, object data, string accepts)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-            Ensure.ArgumentNotNull(data, "data");
-            Ensure.ArgumentNotNull(accepts, "accepts");
-
             var response = await Connection.Delete<T>(uri, data, accepts).ConfigureAwait(false);
-
             return response.Body;
         }
 
@@ -549,8 +416,6 @@ namespace RSS.Clients.Canvas.Http
         {
             while (true)
             {
-                Ensure.ArgumentNotNull(uri, "uri");
-
                 var response = await Connection.GetResponse<IReadOnlyList<T>>(uri, cancellationToken).ConfigureAwait(false);
 
                 switch (response.HttpResponse.StatusCode)
@@ -573,8 +438,6 @@ namespace RSS.Clients.Canvas.Http
             IDictionary<string, string> parameters,
             string accepts)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-
             var response = await Connection.Get<List<T>>(uri, parameters, accepts).ConfigureAwait(false);
             return new ReadOnlyPagedCollection<T>(
                 response,
@@ -587,8 +450,6 @@ namespace RSS.Clients.Canvas.Http
             string accepts,
             ApiOptions options)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-
             var connection = Connection;
 
             var response = await connection.Get<List<TU>>(uri, parameters, accepts).ConfigureAwait(false);

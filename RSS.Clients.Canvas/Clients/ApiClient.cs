@@ -14,8 +14,6 @@ namespace RSS.Clients.Canvas.Clients
         /// <param name="apiConnection">The client's connection</param>
         protected ApiClient(IApiConnection apiConnection)
         {
-            Ensure.ArgumentNotNull(apiConnection, "apiConnection");
-
             ApiConnection = apiConnection;
             Connection = apiConnection.Connection;
         }

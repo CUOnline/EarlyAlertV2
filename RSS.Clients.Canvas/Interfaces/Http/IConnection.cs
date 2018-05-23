@@ -135,19 +135,6 @@ namespace RSS.Clients.Canvas.Interfaces.Http
         /// <param name="body">The object to serialize as the body of the request</param>
         /// <param name="accepts">Specifies accepted response media types.</param>
         /// <param name="contentType">Specifies the media type of the request body</param>
-        /// <param name="twoFactorAuthenticationCode">Two Factor Authentication Code</param>
-        /// <returns><seealso cref="IResponse"/> representing the received HTTP response</returns>
-        Task<IApiResponse<T>> Post<T>(Uri uri, object body, string accepts, string contentType, string twoFactorAuthenticationCode);
-
-        /// <summary>
-        /// Performs an asynchronous HTTP POST request.
-        /// Attempts to map the response body to an object of type <typeparamref name="T"/>
-        /// </summary>
-        /// <typeparam name="T">The type to map the response to</typeparam>
-        /// <param name="uri">URI endpoint to send request to</param>
-        /// <param name="body">The object to serialize as the body of the request</param>
-        /// <param name="accepts">Specifies accepted response media types.</param>
-        /// <param name="contentType">Specifies the media type of the request body</param>
         /// <param name="timeout"></param>
         /// <returns><seealso cref="IResponse"/> representing the received HTTP response</returns>
         Task<IApiResponse<T>> Post<T>(Uri uri, object body, string accepts, string contentType, TimeSpan timeout);
@@ -181,30 +168,6 @@ namespace RSS.Clients.Canvas.Interfaces.Http
         Task<IApiResponse<T>> Put<T>(Uri uri, object body);
 
         /// <summary>
-        /// Performs an asynchronous HTTP PUT request using the provided two factor authentication code.
-        /// Attempts to map the response body to an object of type <typeparamref name="T"/>
-        /// </summary>
-        /// <typeparam name="T">The type to map the response to</typeparam>
-        /// <param name="uri">URI endpoint to send request to</param>
-        /// <param name="body">The object to serialize as the body of the request</param>
-        /// <param name="twoFactorAuthenticationCode">Two factory authentication code to use</param>
-        /// <returns><seealso cref="IResponse"/> representing the received HTTP response</returns>
-        Task<IApiResponse<T>> Put<T>(Uri uri, object body, string twoFactorAuthenticationCode);
-
-        /// <summary>
-        /// Performs an asynchronous HTTP PUT request using the provided two factor authentication code.
-        /// Attempts to map the response body to an object of type <typeparamref name="T"/>
-        /// </summary>
-        /// <typeparam name="T">The type to map the response to</typeparam>
-        /// <param name="uri">URI endpoint to send request to</param>
-        /// <param name="body">The object to serialize as the body of the request</param>
-        /// <param name="twoFactorAuthenticationCode">Two factory authentication code to use</param>
-        /// <param name="accepts">Specifies accepted response media types.</param>
-        /// <returns><seealso cref="IResponse"/> representing the received HTTP response</returns>
-        Task<IApiResponse<T>> Put<T>(Uri uri, object body, string twoFactorAuthenticationCode, string accepts);
-
-
-        /// <summary>
         /// Performs an asynchronous HTTP PUT request that expects an empty response.
         /// </summary>
         /// <param name="uri">URI endpoint to send request to</param>
@@ -225,15 +188,7 @@ namespace RSS.Clients.Canvas.Interfaces.Http
         /// <param name="uri">URI endpoint to send request to</param>
         /// <returns>The returned <seealso cref="HttpStatusCode"/></returns>
         Task<HttpStatusCode> Delete(Uri uri);
-
-        /// <summary>
-        /// Performs an asynchronous HTTP DELETE request that expects an empty response.
-        /// </summary>
-        /// <param name="uri">URI endpoint to send request to</param>
-        /// <param name="twoFactorAuthenticationCode">Two Factor Code</param>
-        /// <returns>The returned <seealso cref="HttpStatusCode"/></returns>
-        Task<HttpStatusCode> Delete(Uri uri, string twoFactorAuthenticationCode);
-
+        
         /// <summary>
         /// Performs an asynchronous HTTP DELETE request that expects an empty response.
         /// </summary>

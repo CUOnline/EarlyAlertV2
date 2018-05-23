@@ -26,7 +26,6 @@ namespace RSS.Clients.Canvas.Http
         
         public HttpClientAdapter(Func<HttpMessageHandler> getHandler)
         {
-            Ensure.ArgumentNotNull(getHandler, "getHandler");
             httpClient = new HttpClient(new CustomDelegatingHandler() { InnerHandler = getHandler() });
         }
 
@@ -38,8 +37,6 @@ namespace RSS.Clients.Canvas.Http
         /// <returns>A <see cref="Task" /> of <see cref="IResponse"/></returns>
         public async Task<IResponse> Send(IRequest request, CancellationToken cancellationToken)
         {
-            Ensure.ArgumentNotNull(request, "request");
-
             var cancellationTokenForRequest = GetCancellationTokenForRequest(request, cancellationToken);
 
             using (var requestMessage = BuildRequestMessage(request))
@@ -66,8 +63,6 @@ namespace RSS.Clients.Canvas.Http
 
         protected virtual async Task<IResponse> BuildResponse(HttpResponseMessage responseMessage)
         {
-            Ensure.ArgumentNotNull(responseMessage, "responseMessage");
-
             object responseBody = null;
             string contentType = null;
 
@@ -105,7 +100,6 @@ namespace RSS.Clients.Canvas.Http
 
         protected virtual HttpRequestMessage BuildRequestMessage(IRequest request)
         {
-            Ensure.ArgumentNotNull(request, "request");
             HttpRequestMessage requestMessage = null;
             try
             {

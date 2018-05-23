@@ -28,6 +28,11 @@ namespace EarlyAlertV2.BLL
             return studentRepository.GetAll();
         }
 
+        public IEnumerable<Student> GetAll(IEnumerable<int> studentIds)
+        {
+            return studentRepository.GetAll(studentIds);
+        }
+
         public Student Get(int modelId)
         {
             return studentRepository.Get(modelId);

@@ -16,10 +16,6 @@ namespace RSS.Clients.Canvas.Http
             string etag,
             RateLimit rateLimit)
         {
-            Ensure.ArgumentNotNull(links, "links");
-            Ensure.ArgumentNotNull(oauthScopes, "oauthScopes");
-            Ensure.ArgumentNotNull(acceptedOauthScopes, "acceptedOauthScopes");
-
             Links = new ReadOnlyDictionary<string, Uri>(links);
             OauthScopes = new ReadOnlyCollection<string>(oauthScopes);
             AcceptedOauthScopes = new ReadOnlyCollection<string>(acceptedOauthScopes);

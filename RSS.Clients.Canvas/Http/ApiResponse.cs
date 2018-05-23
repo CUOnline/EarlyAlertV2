@@ -24,8 +24,6 @@ namespace RSS.Clients.Canvas.Http
         /// <param name="bodyAsObject">The payload from an existing request</param>
         public ApiResponse(IResponse response, T bodyAsObject)
         {
-            Ensure.ArgumentNotNull(response, "response");
-
             HttpResponse = response;
             Body = bodyAsObject;
         }

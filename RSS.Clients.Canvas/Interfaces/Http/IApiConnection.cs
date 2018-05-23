@@ -193,19 +193,6 @@ namespace RSS.Clients.Canvas.Interfaces.Http
         /// <param name="data">Object that describes the new API resource; this will be serialized and used as the request's body</param>
         /// <param name="accepts">Accept header to use for the API request</param>
         /// <param name="contentType">Content type of the API request</param>
-        /// <param name="twoFactorAuthenticationCode">Two Factor Authentication Code</param>
-        /// <returns>The created API resource.</returns>
-        /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
-        Task<T> Post<T>(Uri uri, object data, string accepts, string contentType, string twoFactorAuthenticationCode);
-
-        /// <summary>
-        /// Creates a new API resource in the list at the specified URI.
-        /// </summary>
-        /// <typeparam name="T">The API resource's type.</typeparam>
-        /// <param name="uri">URI of the API resource to get</param>
-        /// <param name="data">Object that describes the new API resource; this will be serialized and used as the request's body</param>
-        /// <param name="accepts">Accept header to use for the API request</param>
-        /// <param name="contentType">Content type of the API request</param>
         /// <param name="timeout">Timeout for the request</param>
         /// <returns>The created API resource.</returns>
         /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
@@ -227,30 +214,6 @@ namespace RSS.Clients.Canvas.Interfaces.Http
         /// <returns>The created API resource.</returns>
         /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
         Task<T> Put<T>(Uri uri, object data);
-
-        /// <summary>
-        /// Creates or replaces the API resource at the specified URI.
-        /// </summary>
-        /// <typeparam name="T">The API resource's type.</typeparam>
-        /// <param name="uri">URI of the API resource to create or replace</param>
-        /// <param name="data">Object that describes the API resource; this will be serialized and used as the request's body</param>
-        /// <param name="twoFactorAuthenticationCode">The two-factor authentication code in response to the current user's previous challenge</param>
-        /// <returns>The created API resource.</returns>
-        /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
-        Task<T> Put<T>(Uri uri, object data, string twoFactorAuthenticationCode);
-
-        /// <summary>
-        /// Creates or replaces the API resource at the specified URI.
-        /// </summary>
-        /// <typeparam name="T">The API resource's type.</typeparam>
-        /// <param name="uri">URI of the API resource to create or replace</param>
-        /// <param name="data">Object that describes the API resource; this will be serialized and used as the request's body</param>
-        /// <param name="twoFactorAuthenticationCode">The two-factor authentication code in response to the current user's previous challenge</param>
-        /// <param name="accepts">Accept header to use for the API request</param>
-        /// <returns>The created API resource.</returns>
-        /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
-        Task<T> Put<T>(Uri uri, object data, string twoFactorAuthenticationCode, string accepts);
-
 
         /// <summary>
         /// Updates the API resource at the specified URI.

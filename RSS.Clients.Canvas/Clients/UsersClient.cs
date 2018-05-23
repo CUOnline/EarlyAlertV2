@@ -22,22 +22,16 @@ namespace RSS.Clients.Canvas.Clients
 
         public Task<UserResult> Get(int id)
         {
-            Ensure.ArgumentNotNull(id, "userId");
-
             return ApiConnection.Get<UserResult>(ApiUrls.User(id));
         }
 
         public Task<UserResult> Get(string sisUserId)
         {
-            Ensure.ArgumentNotNull(sisUserId, "sisUserId");
-
             return ApiConnection.Get<UserResult>(ApiUrls.User(sisUserId));
         }
 
         public Task<List<PageViewsResult>> GetLatestPageView(string sisUserId)
         {
-            Ensure.ArgumentNotNull(sisUserId, "sisUserId");
-
             return ApiConnection.Get<List<PageViewsResult>>(ApiUrls.UserLatestPageView(sisUserId));
         }
     }

@@ -44,7 +44,6 @@ namespace RSS.Clients.Canvas
             }
             set
             {
-                Ensure.ArgumentNotNull(value, "value");
                 Connection.Credentials = value;
             }
         }
@@ -55,11 +54,6 @@ namespace RSS.Clients.Canvas
             {
                 return Connection.BaseAddress;
             }
-            //set
-            //{
-            //    Ensure.ArgumentNotNull(value, "value");
-            //    Connection.BaseAddress = value;
-            //}
         }
 
         public IConnection Connection { get; private set; }

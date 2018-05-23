@@ -17,8 +17,6 @@ namespace RSS.Clients.Canvas.Interfaces.Http
         /// <param name="credentials"></param>
         public InMemoryCredentialStore(Credentials credentials)
         {
-            Ensure.ArgumentNotNull(credentials, "credentials");
-
             _credentials = credentials;
         }
 

@@ -1335,7 +1335,7 @@ namespace RSS.Clients.Canvas
                                     }
                                     catch (Exception ex)
                                     {
-                                        throw new Exception($"Failed to deserialize {setter.Key}.  Value: {jsonValue}");
+                                        throw new Exception($"Failed to deserialize {setter.Key}.  Value: {jsonValue}. {ex}");
                                     }
                                     setter.Value.Value(obj, jsonValue);
                                 }

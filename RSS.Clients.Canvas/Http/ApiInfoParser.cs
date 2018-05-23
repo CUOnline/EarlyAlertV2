@@ -15,8 +15,6 @@ namespace RSS.Clients.Canvas.Http
 
         public static ApiInfo ParseResponseHeaders(IDictionary<string, string> responseHeaders)
         {
-            Ensure.ArgumentNotNull(responseHeaders, "responseHeaders");
-
             var httpLinks = new Dictionary<string, Uri>();
             var oauthScopes = new List<string>();
             var acceptedOauthScopes = new List<string>();

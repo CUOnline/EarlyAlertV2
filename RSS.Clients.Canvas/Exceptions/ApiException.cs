@@ -10,13 +10,12 @@ using RSS.Clients.Canvas.Models.Response;
 namespace RSS.Clients.Canvas.Exceptions
 {
     /// <summary>
-    /// Represents errors that occur from the GitHub API.
+    /// Represents errors that occur.
     /// </summary>
     [Serializable]
     public class ApiException : Exception
     {
-        // This needs to be hard-coded for translating GitHub error messages.
-        static readonly IJsonSerializer _jsonSerializer = new SimpleJsonSerializer();
+        private static readonly IJsonSerializer _jsonSerializer = new SimpleJsonSerializer();
 
         /// <summary>
         /// Constructs an instance of ApiException
@@ -62,8 +61,6 @@ namespace RSS.Clients.Canvas.Exceptions
         public ApiException(IResponse response, Exception innerException)
             : base(null, innerException)
         {
-            Ensure.ArgumentNotNull(response, "response");
-
             StatusCode = response.StatusCode;
             ApiError = GetApiErrorFromExceptionMessage(response);
             HttpResponse = response;
@@ -75,8 +72,6 @@ namespace RSS.Clients.Canvas.Exceptions
         /// <param name="innerException">The inner exception</param>
         protected ApiException(ApiException innerException)
         {
-            Ensure.ArgumentNotNull(innerException, "innerException");
-
             StatusCode = innerException.StatusCode;
             ApiError = innerException.ApiError;
         }
@@ -91,8 +86,6 @@ namespace RSS.Clients.Canvas.Exceptions
         protected ApiException(ApiError apiError, HttpStatusCode statusCode, Exception innerException)
             : base(null, innerException)
         {
-            Ensure.ArgumentNotNull(apiError, "apiError");
-
             ApiError = apiError;
             StatusCode = statusCode;
         }

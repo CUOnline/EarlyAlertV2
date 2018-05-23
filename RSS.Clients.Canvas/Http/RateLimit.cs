@@ -12,8 +12,6 @@ namespace RSS.Clients.Canvas.Http
 
         public RateLimit(IDictionary<string, string> responseHeaders)
         {
-            Ensure.ArgumentNotNull(responseHeaders, "responseHeaders");
-
             Limit = (int)GetHeaderValueAsInt32Safe(responseHeaders, "X-RateLimit-Limit");
             Remaining = (int)GetHeaderValueAsInt32Safe(responseHeaders, "X-RateLimit-Remaining");
             ResetAsUtcEpochSeconds = GetHeaderValueAsInt32Safe(responseHeaders, "X-RateLimit-Reset");
@@ -21,10 +19,6 @@ namespace RSS.Clients.Canvas.Http
 
         public RateLimit(int limit, int remaining, long reset)
         {
-            Ensure.ArgumentNotNull(limit, "limit");
-            Ensure.ArgumentNotNull(remaining, "remaining");
-            Ensure.ArgumentNotNull(reset, "reset");
-
             Limit = limit;
             Remaining = remaining;
             ResetAsUtcEpochSeconds = reset;
@@ -54,11 +48,7 @@ namespace RSS.Clients.Canvas.Http
 
         static long GetHeaderValueAsInt32Safe(IDictionary<string, string> responseHeaders, string key)
         {
-            string value;
-            long result;
-            return !responseHeaders.TryGetValue(key, out value) || value == null || !long.TryParse(value, out result)
-                ? 0
-                : result;
+            return !responseHeaders.TryGetValue(key, out string value) || value == null || !long.TryParse(value, out long result) ? 0 : result;
         }
 
         internal string DebuggerDisplay

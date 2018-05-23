@@ -41,8 +41,6 @@ namespace RSS.Clients.Canvas.Helpers
         /// <returns>Updated request Uri</returns>
         public static Uri ApplyParameters(this Uri uri, IDictionary<string, string> parameters)
         {
-            Ensure.ArgumentNotNull(uri, "uri");
-
             if (parameters == null || !parameters.Any()) return uri;
 
             // to prevent values being persisted across requests

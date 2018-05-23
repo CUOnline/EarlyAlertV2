@@ -1,6 +1,7 @@
 using EarlyAlertV2.Interfaces.Repository;
 using EarlyAlertV2.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +22,18 @@ namespace EarlyAlertV2.Repository
         public IQueryable<Student> GetAll()
         {
             return Context.Students;
+        }
+
+        public IQueryable<Student> GetAll(IEnumerable<int> studentIds)
+        {
+            return Context.Students
+                .Include(x => x.StudentCourses)
+                    .ThenInclude(x => x.Course)
+                        .ThenInclude(x => x.Assignments)
+                .Include(x => x.StudentAssignmentSubmissions)
+                .Include(x => x.CourseGrades)
+                    .ThenInclude(x => x.Course)
+                .Where(x => studentIds.Contains(x.Id));
         }
 
         public Student Get(int modelId)

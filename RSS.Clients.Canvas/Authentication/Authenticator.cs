@@ -17,14 +17,11 @@ namespace RSS.Clients.Canvas.Authentication
 
         public Authenticator(ICredentialStore credentialStore)
         {
-            Ensure.ArgumentNotNull(credentialStore, "credentialStore");
             CredentialStore = credentialStore;
         }
 
         public async Task Apply(IRequest request)
         {
-            Ensure.ArgumentNotNull(request, "request");
-
             var credentials = await CredentialStore.GetCredentials().ConfigureAwait(false);
             authenticators[credentials.AuthenticationType].Authenticate(request, credentials);
         }

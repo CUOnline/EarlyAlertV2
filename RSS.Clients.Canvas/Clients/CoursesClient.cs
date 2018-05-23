@@ -21,8 +21,6 @@ namespace RSS.Clients.Canvas.Clients
 
         public Task<CourseResult> Get(string courseId)
         {
-            Ensure.ArgumentNotNull(courseId, "courseId");
-
             return ApiConnection.Get<CourseResult>(ApiUrls.Course(courseId));
         }
 
@@ -45,14 +43,14 @@ namespace RSS.Clients.Canvas.Clients
             return ApiConnection.GetAll<CourseResult>(ApiUrls.UserCourses(userId), parameters);
         }
 
-        public Task<IReadOnlyList<UserSubmissionsResult>> GetAllUserSubmissions(List<int> userId, int courseId)
+        public async Task<IReadOnlyList<UserSubmissionsResult>> GetAllUserSubmissions(List<int> userId, int courseId)
         {
             var parameters = new Dictionary<string, string>();
 
             parameters.Add("grouped", "1");
             parameters.Add("student_ids[]", string.Join(",", userId));
             
-            return ApiConnection.GetAll<UserSubmissionsResult>(ApiUrls.UserSubmissions(courseId), parameters);
+            return await ApiConnection.GetAll<UserSubmissionsResult>(ApiUrls.UserSubmissions(courseId), parameters);
         }
 
         public Task<IReadOnlyList<AssignmentGroupResult>> GetAllAssignmentGroups(int courseId)

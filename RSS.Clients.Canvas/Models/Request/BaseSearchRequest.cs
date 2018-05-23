@@ -26,7 +26,6 @@ namespace RSS.Clients.Canvas.Models.Request
         /// <param name="term">The term.</param>
         protected BaseSearchRequest(string term) : this()
         {
-            Ensure.ArgumentNotNullOrEmptyString(term, "term");
             Term = term;
         }
 

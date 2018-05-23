@@ -19,7 +19,7 @@ namespace EarlyAlertV2.Controllers
             this.reportSettingsBll = reportSettingsBll;
         }
 
-        public async Task<IActionResult> ReportSettings()
+        public IActionResult ReportSettings()
         {
             var model = reportSettingsBll.GetAll().FirstOrDefault() ?? new ReportSettings();
 
@@ -27,7 +27,7 @@ namespace EarlyAlertV2.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ReportSettings(ReportSettings reportSettings)
+        public IActionResult ReportSettings(ReportSettings reportSettings)
         {
             var settingsSum = GetReportSettingsSum(reportSettings);
             if (settingsSum != 100.0)
@@ -55,7 +55,7 @@ namespace EarlyAlertV2.Controllers
             return View(reportSettings);
         }
 
-        public async Task<IActionResult> ReportSettingsConfirmation()
+        public IActionResult ReportSettingsConfirmation()
         {
             return View();
         }

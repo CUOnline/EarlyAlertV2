@@ -22,8 +22,6 @@ namespace RSS.Clients.Canvas.Helpers
 
         public static Uri FormatUri(this string pattern, params object[] args)
         {
-            Ensure.ArgumentNotNullOrEmptyString(pattern, "pattern");
-
             return new Uri(string.Format(CultureInfo.InvariantCulture, pattern, args), UriKind.Relative);
         }
 
@@ -72,25 +70,20 @@ namespace RSS.Clients.Canvas.Helpers
             Justification = "Ruby don't care. Ruby don't play that.")]
         public static string ToRubyCase(this string propertyName)
         {
-            Ensure.ArgumentNotNullOrEmptyString(propertyName, "propertyName");
             return string.Join("_", propertyName.SplitUpperCase()).ToLowerInvariant();
         }
 
         public static string FromRubyCase(this string propertyName)
         {
-            Ensure.ArgumentNotNullOrEmptyString(propertyName, "propertyName");
             return string.Join("", propertyName.Split('_')).ToCapitalizedInvariant();
         }
 
         public static string ToCapitalizedInvariant(this string value)
         {
-            Ensure.ArgumentNotNullOrEmptyString(value, "value");
             return string.Concat(value[0].ToString().ToUpperInvariant(), value.Substring(1));
         }
         static IEnumerable<string> SplitUpperCase(this string source)
         {
-            Ensure.ArgumentNotNullOrEmptyString(source, "source");
-
             int wordStartIndex = 0;
             var letters = source.ToCharArray();
             var previousChar = char.MinValue;

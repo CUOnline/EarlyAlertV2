@@ -7,8 +7,6 @@ namespace RSS.Clients.Canvas.Http
     {
         public Credentials(string token, AuthenticationType authType)
         {
-            Ensure.ArgumentNotNullOrEmptyString(token, "token");
-
             Login = null;
             Password = token;
             AuthenticationType = authType;

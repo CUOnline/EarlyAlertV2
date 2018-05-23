@@ -1,7 +1,7 @@
 ﻿namespace RSS.Clients.Canvas.Authentication
 {
     /// <summary>
-    /// Authentication protocols supported by the GitHub API
+    /// Authentication protocols
     /// </summary>
     public enum AuthenticationType
     {

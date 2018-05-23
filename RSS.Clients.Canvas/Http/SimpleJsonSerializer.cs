@@ -63,8 +63,6 @@ namespace RSS.Clients.Canvas.Http
             // This is overridden so that null values are omitted from serialized objects.
             protected override bool TrySerializeUnknownTypes(object input, out object output)
             {
-                Ensure.ArgumentNotNull(input, "input");
-
                 var type = input.GetType();
                 var getters = GetCache[type];
 
@@ -135,7 +133,7 @@ namespace RSS.Clients.Canvas.Http
                 return cachedEnumsForType.GetOrAdd(value, v => Enum.Parse(type, value, ignoreCase: true));
             }
 
-            private string _type;
+            //private string _type;
 
             // Overridden to handle enums.
             public override object DeserializeObject(object value, Type type)

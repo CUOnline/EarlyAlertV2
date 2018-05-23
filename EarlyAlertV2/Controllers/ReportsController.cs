@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RSS.Clients.Canvas;
+using RSS.Clients.Canvas.Exceptions;
 using RSS.Clients.Canvas.Models.Response;
 
 namespace EarlyAlertV2.Controllers
@@ -463,9 +464,9 @@ namespace EarlyAlertV2.Controllers
                     {
                         studentSubmissionResults = await canvasClient.CoursesClient.GetAllUserSubmissions(new List<int>() { student.CanvasId }, studentCourse.Course.CanvasId);
                     }
-                    catch (Exception ex)
+                    catch (AuthorizationException)
                     {
-                        // Error Code 400 for Yaning Song... a teacher .... why are they on this list?
+                        // Supress unauthroized exception.  Ran into this when running Yaning Song, who is a teacher for a sandbox course.
                     }
 
                     foreach (var submissionResult in studentSubmissionResults)

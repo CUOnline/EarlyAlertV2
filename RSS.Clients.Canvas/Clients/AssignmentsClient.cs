@@ -19,8 +19,6 @@ namespace RSS.Clients.Canvas.Clients
 
         public Task<AssignmentResult> Get(int assignmentId)
         {
-            Ensure.ArgumentNotNull(assignmentId, "assignmentId");
-
             return ApiConnection.Get<AssignmentResult>(ApiUrls.Assignment(assignmentId));
         }
 

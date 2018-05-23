@@ -24,9 +24,6 @@ namespace RSS.Clients.Canvas.Helpers
         /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
         public static Task<IReadOnlyList<T>> GetAll<T>(this IApiConnection connection, Uri uri)
         {
-            Ensure.ArgumentNotNull(connection, "connection");
-            Ensure.ArgumentNotNull(uri, "uri");
-
             return connection.GetAll<T>(uri, ApiOptions.None);
         }
 
@@ -39,9 +36,6 @@ namespace RSS.Clients.Canvas.Helpers
         /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
         public static Task<string> GetHtml(this IApiConnection connection, Uri uri)
         {
-            Ensure.ArgumentNotNull(connection, "connection");
-            Ensure.ArgumentNotNull(uri, "uri");
-
             return connection.GetHtml(uri, null);
         }
 
@@ -53,9 +47,6 @@ namespace RSS.Clients.Canvas.Helpers
         /// <returns><seealso cref="IResponse"/> representing the received HTTP response</returns>
         public static Task<IApiResponse<string>> GetHtml(this IConnection connection, Uri uri)
         {
-            Ensure.ArgumentNotNull(connection, "connection");
-            Ensure.ArgumentNotNull(uri, "uri");
-
             return connection.GetHtml(uri, null);
         }
 
@@ -69,9 +60,6 @@ namespace RSS.Clients.Canvas.Helpers
         /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
         public static Task<IApiResponse<T>> GetResponse<T>(this IConnection connection, Uri uri)
         {
-            Ensure.ArgumentNotNull(connection, "connection");
-            Ensure.ArgumentNotNull(uri, "uri");
-
             return connection.Get<T>(uri, null, null);
         }
 
@@ -86,9 +74,6 @@ namespace RSS.Clients.Canvas.Helpers
         /// <exception cref="ApiException">Thrown when an API error occurs.</exception>
         public static Task<IApiResponse<T>> GetResponse<T>(this IConnection connection, Uri uri, CancellationToken cancellationToken)
         {
-            Ensure.ArgumentNotNull(connection, "connection");
-            Ensure.ArgumentNotNull(uri, "uri");
-
             return connection.Get<T>(uri, null, null, cancellationToken);
         }
 
@@ -97,16 +82,13 @@ namespace RSS.Clients.Canvas.Helpers
         /// Throws an exception if the HTTP status does not match either a true or false response.
         /// </summary>
         /// <remarks>
-        /// Some API endpoints return a 204 for "true" and 404 for false. See https://developer.github.com/v3/activity/starring/#check-if-you-are-starring-a-repository
-        /// for one example. This encapsulates that logic.
+        /// Some API endpoints return a 204 for "true" and 404 for false.
         /// </remarks>
         /// <exception cref="ApiException">Thrown if the status is neither 204 nor 404</exception>
         /// <param name="response">True for a 204 response, False for a 404</param>
         /// <returns></returns>
         public static bool IsTrue(this IResponse response)
         {
-            Ensure.ArgumentNotNull(response, "response");
-
             if (response.StatusCode != HttpStatusCode.NotFound && response.StatusCode != HttpStatusCode.NoContent)
             {
                 throw new ApiException("Invalid Status Code returned. Expected a 204 or a 404", response.StatusCode);

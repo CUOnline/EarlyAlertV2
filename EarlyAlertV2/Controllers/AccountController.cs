@@ -39,7 +39,7 @@ namespace EarlyAlertV2.Controllers
         }
 
         [AuthorizeRoles(UserRoles.OITAdminRole, UserRoles.AdminRole)]
-        public async Task<IActionResult> UserAccounts()
+        public IActionResult UserAccounts()
         {
             var model = new UserAccountsViewModel();
             model.Users = _userManager.Users
@@ -51,7 +51,7 @@ namespace EarlyAlertV2.Controllers
 
         [HttpPost]
         [AuthorizeRoles(UserRoles.OITAdminRole, UserRoles.AdminRole)]
-        public async Task<IActionResult> SearchUserAccounts(UserAccountsViewModel model)
+        public IActionResult SearchUserAccounts(UserAccountsViewModel model)
         {
             if(!string.IsNullOrWhiteSpace(model.SearchFirstName) && !string.IsNullOrWhiteSpace(model.SearchLastName))
             {

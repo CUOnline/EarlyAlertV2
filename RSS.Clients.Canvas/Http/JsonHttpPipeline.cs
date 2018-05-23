@@ -27,8 +27,6 @@ namespace RSS.Clients.Canvas.Http
 
         public void SerializeRequest(IRequest request)
         {
-            Ensure.ArgumentNotNull(request, "request");
-
             if (!request.Headers.ContainsKey("Accept"))
             {
                 request.Headers["Accept"] = AcceptHeaders.StableVersionJson;
@@ -42,8 +40,6 @@ namespace RSS.Clients.Canvas.Http
 
         public IApiResponse<T> DeserializeResponse<T>(IResponse response)
         {
-            Ensure.ArgumentNotNull(response, "response");
-
             if (response.ContentType != null && response.ContentType.Equals("application/json", StringComparison.Ordinal))
             {
                 var body = response.Body as string;
