@@ -121,7 +121,7 @@ namespace EarlyAlertV2
 
             AdminAccount adminAccount = new AdminAccount();
             Configuration.GetSection(nameof(AdminAccount)).Bind(adminAccount);
-            //Seeder.SeedIt(app.ApplicationServices, adminAccount.UserName, adminAccount.Password);
+            Seeder.SeedIt(app.ApplicationServices, adminAccount.UserName, adminAccount.Password);
         }
     }
 }
