@@ -19,88 +19,90 @@
 
 </style>
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header" data-background-color="blue">
-                <div class="row">
-                    <div class="col-md-6 col-sm-6 col-xs-6">
-                        <div class="card-block">
-                            <h4 class="title">Students</h4>
-                            <p class="category">Select a student to see his/her student profile.</p>
+<div id="app">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header" data-background-color="blue">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6 col-xs-6">
+                            <div class="card-block">
+                                <h4 class="title">Students</h4>
+                                <p class="category">Select a student to see his/her student profile.</p>
+                            </div>
                         </div>
-                    </div>
-                    @if (User.IsInRole(UserRoles.AdminRole) || User.IsInRole(UserRoles.OITAdminRole))
-                    {
-                    <div class="col-md-6 col-sm-6 col-xs-6 text-right">
+                        @if (User.IsInRole(UserRoles.AdminRole) || User.IsInRole(UserRoles.OITAdminRole))
+                        {
+                            <div class="col-md-6 col-sm-6 col-xs-6 text-right">
 
-                        <a asp-controller="Reports" asp-action="RiskIndex" asp-route-reportId="@Model.ReportId" asp-route-refreshData="true">
-                            <p class="reload">Reload Data: <i class="material-icons reload-icon">refresh</i></p>
-                        </a>
+                                <div class="btn btn-link" v-on:click="RefreshData">
+                                    <p class="reload">Reload Data: <i class="material-icons reload-icon">refresh</i></p>
+                                </div>
+                            </div>
+                        }
                     </div>
-                    }
+                </div>
+                <div class="card-content table-responsive">
+                    <table class="table table-hover">
+                        <thead class="text-primary">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Risk Index</th>
+                            </tr>
+                        </thead>
+                        <tbody v-for="user in orderedUsers">
+                            <tr v-on:click="viewStudentProfile(user.id)">
+                                <td>{{user.id}}</td>
+                                <td>{{user.name}}</td>
+                                <td v-if="user.riskIndex >= 75">
+                                    <div class="progress-bar progress-bar-danger" role="progressbar" v-bind:style="'width: ' + user.riskIndex + '%'">
+                                        {{user.riskIndex | formatRiskIndex}}%
+                                    </div>
+                                    {{user.riskIndex}}
+                                </td>
+                                <td v-else-if="user.riskIndex >= 50">
+                                    <div class="progress-bar" role="progressbar" v-bind:style="'background-color: #f59a2a; width: '+ user.riskIndex + '%'">
+                                        {{user.riskIndex | formatRiskIndex}}%
+                                    </div>
+                                </td>
+                                <td v-else-if="user.riskIndex >= 25">
+                                    <div class="progress-bar" role="progressbar" v-bind:style="'background-color: #baca38; width: '+ user.riskIndex + '%'">
+                                        {{user.riskIndex | formatRiskIndex}}%
+                                    </div>
+                                </td>
+                                <td v-else>
+                                    <div class="progress-bar progress-bar-success" role="progressbar" v-bind:style="'width: ' + user.riskIndex + '%'">
+                                        {{user.riskIndex | formatRiskIndex}}%
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <div class="card-content table-responsive">
-                <table class="table table-hover">
-                    <thead class="text-primary">
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Risk Index</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var index in Model.UserRiskIndicies.OrderByDescending(x => x.Value))
-                        {
-                        var user = Model.Users.First(x => x.Id == index.Key);
-                        <tr class="userRow">
-                            <td>@user.Id</td>
-                            <td>@user.Name</td>
-                            <td>
-                                <div class="progress">
-                                    @{
-                                        var riskIndex = Math.Round(index.Value, 2);
+        </div>
+    </div>
 
-                                        if (riskIndex >= 75) // Ultra High risk 75-100%
-                                        {
-                                            <div class="progress-bar progress-bar-danger" role="progressbar" style="width: @index.Value%">
-                                                @Math.Round(index.Value, 2)%
-                                            </div>
-
-                                        }
-                                        else if (riskIndex >= 50) // High risk 50-74
-                                        {
-                                            <div class="progress-bar" role="progressbar" style="background-color: #f59a2a; width: @index.Value%">
-                                                @Math.Round(index.Value, 2)%
-                                            </div>
-
-                                        }
-                                        else if (riskIndex >= 25) // Medium Risk 25-49
-                                        {
-                                            <div class="progress-bar" role="progressbar" style="background-color: #baca38; width: @index.Value%">
-                                                @Math.Round(index.Value, 2)%
-                                            </div>
-
-                                        }
-                                        else // Low risk 0-24
-                                        {
-                                            <div class="progress-bar progress-bar-success" role="progressbar" style="width: @index.Value%">
-                                                @Math.Round(index.Value, 2)%
-                                            </div>
-                                        }
-                                    }
-                                </div>
-                            </td>
-                        </tr>
-                        }
-                    </tbody>
-                </table>
+    <div class="modal fade" id="pleaseWaitDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1>Processing...</h1>
+                </div>
+                <div class="modal-body">
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" v-bind:aria-valuenow="refreshProgress" aria-valuemin="0" aria-valuemax="100" v-bind:style="'width: ' + refreshProgress + '%'">
+                            <span class="sr-only">{{refreshProgress}}% Complete (success)</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<script type="text/javascript" src="~/js/RiskIndex.js"></script>
 <script type="text/javascript">
     $('.userRow').click(function () {
         var id = $(this).children('td:first').text();

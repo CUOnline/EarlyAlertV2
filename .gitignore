@@ -3,7 +3,7 @@
 
 AppSettings.Development.json
 AppSettings.Staging.json
-wwwroot/lib/
+**/wwwroot/lib/
 
 # User-specific files
 *.suo

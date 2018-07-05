@@ -1,8 +1,0 @@
-{
-  "name": "earlyalertv2",
-  "private": true,
-  "dependencies": {
-    "font-awesome": "Font-Awesome#v4.7.0",
-    "jqueri-ui": "1.12.1"
-  }
-}
