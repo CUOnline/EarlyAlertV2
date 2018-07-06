@@ -33,10 +33,14 @@
                         </div>
                         @if (User.IsInRole(UserRoles.AdminRole) || User.IsInRole(UserRoles.OITAdminRole))
                         {
-                            <div class="col-md-6 col-sm-6 col-xs-6 text-right">
-
-                                <div class="btn btn-link" v-on:click="RefreshData">
-                                    <p class="reload">Reload Data: <i class="material-icons reload-icon">refresh</i></p>
+                            <div v-if="loading" class="col-md-6 col-sm-6 col-xs-6 text-right">
+                                <div class="btn btn-primary" v-on:click="viewProgress">
+                                    <p class="reload">View Progress</p>
+                                </div>
+                            </div>
+                            <div v-else class="col-md-6 col-sm-6 col-xs-6 text-right">
+                                <div class="btn btn-primary" v-on:click="refreshData">
+                                    <p class="reload">Reload Data</p>
                                 </div>
                             </div>
                         }
@@ -46,15 +50,20 @@
                     <table class="table table-hover">
                         <thead class="text-primary">
                             <tr>
+                                <th></th>
                                 <th>ID</th>
                                 <th>Name</th>
                                 <th>Risk Index</th>
                             </tr>
                         </thead>
                         <tbody v-for="user in orderedUsers">
-                            <tr v-on:click="viewStudentProfile(user.id)">
+                            <tr v-bind:class="[ user.hasError ? 'danger' : '' ]" v-bind:data-toggle="{ tooltip: user.hasError }" v-bind:data-placement="{ bottom: user.hasError }" v-bind:title="[ user.error ]">
+                                <td v-if="user.error" v-on:click="refreshUserData(user.id)" style="cursor: pointer">
+                                    <i class="material-icons reload-icon">refresh</i>
+                                </td>
+                                <td v-else></td>
                                 <td>{{user.id}}</td>
-                                <td>{{user.name}}</td>
+                                <td v-on:click="viewStudentProfile(user.id)" style="cursor: pointer">{{user.name}}</td>
                                 <td v-if="user.riskIndex >= 75">
                                     <div class="progress-bar progress-bar-danger" role="progressbar" v-bind:style="'width: ' + user.riskIndex + '%'">
                                         {{user.riskIndex | formatRiskIndex}}%
@@ -88,7 +97,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1>Processing...</h1>
+                    <h3>Processing...</h3>
                 </div>
                 <div class="modal-body">
                     <div class="progress">
@@ -103,9 +112,3 @@
 </div>
 
 <script type="text/javascript" src="~/js/RiskIndex.js"></script>
-<script type="text/javascript">
-    $('.userRow').click(function () {
-        var id = $(this).children('td:first').text();
-        location.href = "/Reports/StudentProfile/" + id;
-    });
-</script>
